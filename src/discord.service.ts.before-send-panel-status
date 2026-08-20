@@ -1,0 +1,396 @@
+import { Inject, Injectable, Logger, OnModuleInit, OnApplicationBootstrap, forwardRef } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { TicketsInteractionHandler } from './tickets/tickets-interaction.handler';
+import { SuggestionsInteractionHandler } from './suggestions/suggestions-interaction.handler';
+import { SuggestionStatus } from './suggestions/suggestion-status.enum';
+import { IpCommand } from './server-info/commands/ip.command';
+import { ServerStatus } from './services/server-status.interface';
+import { SendPanelCommand } from './tickets/send-panel.command';
+
+import {
+  APIEmbed,
+  APIMessageTopLevelComponent,
+  ChannelType,
+  Client,
+  Events,
+  ForumChannel,
+  GatewayIntentBits,
+  Guild,
+  Message,
+  JSONEncodable,
+  MessageFlags,
+  TextChannel,
+  ThreadChannel,
+} from 'discord.js';
+import { SupportService } from './support/support.service';
+
+export const STATUS_TAG: Record<SuggestionStatus, string> = {
+  [SuggestionStatus.PENDING]: 'Pendiente',
+  [SuggestionStatus.APPROVED]: 'Aprobada',
+  [SuggestionStatus.REJECTED]: 'Rechazada',
+  [SuggestionStatus.IMPLEMENTED]: 'Implementada',
+};
+
+export interface SuggestionPayload {
+  embeds: ReadonlyArray<APIEmbed | JSONEncodable<APIEmbed>>;
+  components?: ReadonlyArray<APIMessageTopLevelComponent | JSONEncodable<APIMessageTopLevelComponent>>;
+}
+
+export interface SuggestionData {
+  suggestion_number: number;
+  content?: string;
+}
+
+@Injectable()
+export class DiscordService implements OnModuleInit, OnApplicationBootstrap {
+  private readonly logger = new Logger(DiscordService.name);
+  private readonly client: Client;
+  private readonly botEnabled: boolean;
+  public ready = false;
+
+  constructor(
+  private readonly configService: ConfigService,
+  private readonly supportService: SupportService,
+  private readonly ticketsInteractionHandler: TicketsInteractionHandler,
+  @Inject(forwardRef(() => SuggestionsInteractionHandler))
+  private readonly suggestionsInteractionHandler: SuggestionsInteractionHandler,
+  private readonly ipCommand: IpCommand,
+  private readonly sendPanelCommand: SendPanelCommand,
+) {
+
+    const token = this.configService.get<string>('DISCORD_TOKEN');
+    this.botEnabled = Boolean(token);
+
+    this.client = new Client({
+      intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMembers, 
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.MessageContent,
+      ],
+    });
+        
+    this.client.once(Events.ClientReady, async () => {
+      this.ready = true;
+
+      this.logger.log(`Discord client ready as ${this.client.user?.tag}`);
+
+      const commandData = {
+        name: 'send-panel',
+        description: 'Envía paneles del servidor o comunicados de eventos',
+        options: [
+          {
+            name: 'soporte',
+            description: 'Envía paneles de soporte interactivos',
+            type: 1, 
+            options: [
+              {
+                name: 'tipo',
+                description: 'Qué panel de soporte enviar',
+                type: 3, 
+                required: true,
+                choices: [
+                  { name: 'Panel de Tickets', value: 'tickets' },
+                  { name: 'Panel de Postulaciones', value: 'postulacion' },
+                  { name: 'Panel de Sugerencias', value: 'sugerencias' }
+                ]
+              }
+            ]
+          },
+          {
+            name: 'comunicado',
+            description: 'Envía un comunicado general del bot sin eventos',
+            type: 1
+          },
+          {
+            name: 'reglas-discord',
+            description: 'Publica el reglamento del servidor de Discord',
+            type: 1
+          },
+          {
+            name: 'reglas-servidor',
+            description: 'Publica el reglamento del servidor de Minecraft',
+            type: 1
+          },
+          {
+            name: 'evento',
+            description: 'Envía un panel de evento activo',
+            type: 1, 
+            options: [
+              {
+                name: 'tipo',
+                description: 'Selecciona el tipo de evento',
+                type: 3, 
+                required: true,
+                choices: [
+                  { name: 'Multiplicador x2 EXP en Skills', value: 'skills_x2' }
+                ]
+              },
+              {
+                name: 'horas_inicio',
+                description: '¿En cuántas horas inicia? (0 si empieza ya mismo, 2 para dos horas)',
+                type: 4,
+                required: true
+              }
+            ]
+          }
+        ]
+      };
+
+      try {
+        await this.client.application?.commands.set([commandData]);
+        this.logger.log('Comando slash /send-panel registrado globalmente con subcomandos.');
+      } catch (error) {
+        this.logger.error('Error al registrar el comando slash', error);
+      }
+    });
+        
+    this.client.on(Events.InteractionCreate, async (interaction) => {
+      if (interaction.isChatInputCommand()) {
+        if (interaction.commandName === 'send-panel') {
+          try {
+            // Cambiado de { ephemeral: true } a flags para silenciar el warning de la consola
+            await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
+
+            const subcomando = interaction.options.getSubcommand();
+
+            if (subcomando === 'soporte') {
+              const tipo = interaction.options.getString('tipo');
+              await this.supportService.handleSendPanelCommand(interaction, tipo);
+            } 
+            
+            else if (subcomando === 'comunicado') {
+              await this.supportService.handleSendPanelCommand(interaction, 'bot');
+            } 
+
+            else if (subcomando === 'reglas-discord') {
+              await this.sendPanelCommand.executeReglasDiscord(interaction);
+            }
+
+            else if (subcomando === 'reglas-servidor') {
+              await this.sendPanelCommand.executeReglasServidor(interaction);
+            }
+
+            else if (subcomando === 'evento') {
+              const tipoEvento = interaction.options.getString('tipo') ?? '';
+              const horasParaInicio = interaction.options.getInteger('horas_inicio') ?? 0;
+
+              if (!tipoEvento) {
+                await interaction.editReply({ 
+                  content: ' Error de validación: El tipo de evento es obligatorio y no puede estar vacío.' 
+                });
+                return; 
+              }
+                
+              const fechaInicio = new Date();
+              fechaInicio.setHours(fechaInicio.getHours() + horasParaInicio);
+              const unixTimestamp = Math.floor(fechaInicio.getTime() / 1000);
+
+              await this.supportService.handleSendEventPanel(interaction, tipoEvento, unixTimestamp);
+            }
+
+          } catch (error) {
+            this.logger.error('Error ejecutando /send-panel', error);
+            await interaction.editReply({ content: 'Hubo un error al ejecutar el comando.' });
+          }
+          return; 
+        }
+      }
+
+      await this.ticketsInteractionHandler.handle(interaction);
+      await this.suggestionsInteractionHandler.handle(interaction);
+    });
+      
+    this.client.on(Events.MessageCreate, async (message: Message) => {
+  // Ignorar mensajes del bot
+  if (message.author.bot) return;
+  
+  try {
+    // Comando !ip
+    if (message.content.toLowerCase().startsWith('!ip')) {
+      await this.ipCommand.execute(message);
+      return;
+    }
+
+    await this.supportService.handleMessage(message);
+  } catch (error) {
+    this.logger.error('Error handling message command', error);
+  }
+});
+
+    this.client.on(Events.Error, (error) => {
+      this.logger.error('Discord client error', error);
+    });
+
+    if (!this.botEnabled) {
+      this.logger.warn('Discord token is not configured. Discord bot is disabled.');
+    }
+  }
+
+
+  async onModuleInit() {
+    if (!this.botEnabled) return;
+    const token = this.configService.get<string>('DISCORD_TOKEN');
+    await this.client.login(token);
+  }
+
+  onApplicationBootstrap() {
+    if (!this.botEnabled) return;
+
+    setTimeout(() => {
+      console.log('\n\x1b[36m%s\x1b[0m', '  ==========================================');
+      console.log('\x1b[36m%s\x1b[0m',  '  =  BOT DESARROLLADO POR: CILANTROSMOKER  =');
+      console.log('\x1b[36m%s\x1b[0m', '  ==========================================\n');
+    }, 500);
+  }
+    
+    async updateServerStatusEmbed(status: ServerStatus) {
+
+  const channelId = process.env.SERVER_STATUS_CHANNEL_ID;
+
+  if (!channelId) {
+    throw new Error(
+      'SERVER_STATUS_CHANNEL_ID no está configurado'
+    );
+  }
+
+  const channel =
+    await this.client.channels.fetch(channelId);
+
+  if (!channel || !channel.isTextBased()) {
+    throw new Error(
+      'SERVER_STATUS_CHANNEL_ID no es un canal válido'
+    );
+  }
+
+  const messageId = process.env.SERVER_STATUS_MESSAGE_ID;
+
+  if (!messageId) {
+    throw new Error(
+      'SERVER_STATUS_MESSAGE_ID no está configurado'
+    );
+  }
+
+  const message =
+    await channel.messages.fetch(messageId);
+
+
+  const serverStatus = status.online
+    ? '🟢 Online'
+    : '🔴 Offline';
+
+  const javaStatus = status.online
+    ? '🟢 Online'
+    : '🔴 Offline';
+
+  const bedrockStatus = status.online
+    ? '🟢 Online'
+    : '🔴 Offline';
+
+  // Le sumamos 100ms (puedes cambiar este número si quieres afinarlo más)
+  const realPing = status.latency + 100;
+
+  await message.edit({
+    embeds:[
+      {
+        color: status.online
+          ? 0x00ff00
+          : 0xff0000,
+        
+        title: "📊 Panel de Control - Estado del Servidor",
+        
+        description: 
+          "Monitoreo en tiempo real de la conectividad, versiones y rendimiento general de la comunidad.\n\n" +
+          "📡 **Estado General**\n" +
+          `${serverStatus}  •  ⏱️ **Ping:** ${realPing}ms\n\n` +
+          "🌐 **IP del Servidor**\n" +
+          `\`\`\`${status.ip}\`\`\`\n` +
+          "👥 **Jugadores Conectados**\n" +
+          `\`${status.players} / ${status.maxPlayers}\` jugadores en línea`,
+
+        fields:[
+          {
+            name: "☕ Java Edition",
+            value: `${javaStatus}\nVersión: \`v${status.javaVersion}\``,
+            inline: true,
+          },
+          {
+            name: "📱 Bedrock Edition",
+            value: `${bedrockStatus}\nVersión: \`v${status.bedrockVersion}\``,
+            inline: true,
+          }
+        ],
+
+        footer:{
+         text: `Actualizado ${new Date().toLocaleTimeString('es-CL', { timeZone: 'America/Santiago', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })} • Koshi Village`,
+        }
+      }
+    ]
+  });
+}
+ 
+    isForum(channel: TextChannel | ForumChannel | ThreadChannel | null | undefined): channel is ForumChannel {
+    return channel?.type === ChannelType.GuildForum;
+  }
+
+  private findTagId(forum: ForumChannel | null | undefined, tagName: string): string | null {
+    if (!tagName || !Array.isArray(forum?.availableTags)) return null;
+    const tag = forum.availableTags.find((x) => x.name.toLowerCase() === tagName.toLowerCase());
+    return tag?.id ?? null;
+  }
+
+  private async findThread(guild: Guild, messageId: string): Promise<ThreadChannel | null> {
+    const channel = await guild.channels.fetch(messageId).catch(() => null);
+    if (!channel) return null;
+    if (![ChannelType.PublicThread, ChannelType.PrivateThread, ChannelType.AnnouncementThread].includes(channel.type)) {
+      return null;
+    }
+    return channel as ThreadChannel;
+  }
+
+  async postSuggestion(channel: TextChannel | ForumChannel, sug: SuggestionData, payload: SuggestionPayload) {
+    if (this.isForum(channel)) {
+      const base = String(sug.content || '').replace(/\s+/g, ' ').trim();
+      const name = `Sugerencia #${sug.suggestion_number} — ${base}`.slice(0, 100) || `Sugerencia #${sug.suggestion_number}`;
+      const tagId = this.findTagId(channel, STATUS_TAG[SuggestionStatus.PENDING]);
+      const thread = await channel.threads.create({
+        name,
+        message: { embeds: payload.embeds, components: payload.components },
+        appliedTags: tagId ? [tagId] : [],
+      });
+      const message = await thread.fetchStarterMessage().catch(() => null);
+      return { message, thread, messageId: message?.id ?? thread.id };
+    }
+
+    const message = await channel.send({ embeds: payload.embeds, components: payload.components });
+    return { message, thread: null, messageId: message.id };
+  }
+
+  async fetchSuggestionMessage(guild: Guild, channel: TextChannel | ForumChannel, messageId: string) {
+    if (!channel || !messageId) return null;
+
+    if (this.isForum(channel)) {
+      const thread = await this.findThread(guild, messageId);
+      if (!thread) return null;
+      if (thread.archived) await thread.setArchived(false).catch(() => {});
+      return thread.fetchStarterMessage().catch(() => thread.messages.fetch(messageId).catch(() => null));
+    }
+
+    return channel.messages.fetch(messageId).catch(() => null);
+  }
+
+  async applyStatusTag(guild: Guild, channel: TextChannel | ForumChannel, messageId: string, status: SuggestionStatus) {
+    if (!this.isForum(channel)) return;
+    const tagId = this.findTagId(channel, STATUS_TAG[status]);
+    if (!tagId) return;
+    const thread = await this.findThread(guild, messageId);
+    if (thread?.setAppliedTags) await thread.setAppliedTags([tagId]).catch(() => {});
+  }
+
+  // ==========================================
+  // METODO PUBLICO PARA OBTENER EL CLIENTE
+  // ==========================================
+  public getClient(): Client {
+    return this.client;
+  }
+}

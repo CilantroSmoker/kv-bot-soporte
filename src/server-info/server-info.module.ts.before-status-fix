@@ -1,0 +1,18 @@
+import { Module, forwardRef } from '@nestjs/common';
+import { ServerStatusService } from '../services/server-status.service';
+import { StatusUpdaterService } from './status-updater.service';
+import { DiscordModule } from '../discord.module';
+
+@Module({
+  imports: [
+    forwardRef(() => DiscordModule),
+  ],
+  providers: [
+    ServerStatusService,
+    StatusUpdaterService,
+  ],
+  exports: [
+    ServerStatusService,
+  ],
+})
+export class ServerInfoModule {}
