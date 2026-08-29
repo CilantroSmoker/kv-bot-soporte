@@ -1,0 +1,358 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(11, 9, 8, 0.8);
+  backdrop-filter: blur(6px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn .2s ease;
+}
+
+.modal {
+  width: 90%;
+  max-width: 650px;
+  background: rgba(22, 18, 16, 0.96);
+  border: 1px solid #4A2E1B;
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0,0,0,.8);
+  overflow-x: hidden;
+  color: #EAE6DF;
+}
+
+.closeBtn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: rgba(74, 46, 27, 0.4);
+  border: 1px solid #4A2E1B;
+  color: #EAE6DF;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  z-index: 10;
+  transition: all 0.2s;
+}
+
+.closeBtn:hover {
+  background: #8A271E;
+  border-color: #8A271E;
+}
+
+.rankBanner {
+  height: 120px;
+  border-radius: 14px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1.2rem;
+  background: linear-gradient(135deg, #2a1f18, #110e0c);
+  border: 1px solid #4A2E1B;
+  overflow: hidden;
+}
+
+.benefitDescription {
+  margin-top: 6px;
+  margin-left: 12px;
+  font-size: .88rem;
+  color: rgba(234, 230, 223, 0.75);
+  line-height: 1.45;
+}
+
+.rankBanner span {
+  color: #F49B38;
+  font-size: 1.2rem;
+  letter-spacing: 4px;
+  font-weight: 900;
+  text-shadow: 0 0 15px rgba(244, 155, 56, 0.4);
+}
+
+.rarity {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin: 10px 0;
+}
+
+.rarity span {
+  font-size: 1.4rem;
+  color: #F49B38;
+  text-shadow: 0 0 8px rgba(244, 155, 56, 0.5);
+  filter: drop-shadow(0 0 3px rgba(244, 155, 56, 0.4));
+}
+
+/* CARRIL */
+.slider {
+  display: flex;
+  width: 200%;
+  transition: transform .55s ease;
+}
+
+.modal.active .slider {
+  transform: translateX(-50%);
+}
+
+.panel {
+  width: 50%;
+  flex-shrink: 0;
+  padding: 1.8rem;
+}
+
+/* PRIMER PANEL */
+.rankHeader {
+  text-align: center;
+}
+
+.rankType {
+  color: #F49B38;
+  font-size: .75rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.rankHeader h2 {
+  margin: .5rem 0;
+  color: #EAE6DF;
+  font-size: 2rem;
+}
+
+.price {
+  color: #F49B38;
+  font-size: 2rem;
+  font-weight: bold;
+  margin: 1rem 0;
+}
+
+.rankHeader p {
+  color: #b3aea6;
+  line-height: 1.5;
+}
+
+/* CHAT */
+.preview {
+  margin-top: 1.5rem;
+  background: rgba(15, 12, 10, 0.8);
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid #4A2E1B;
+}
+
+.previewLabel {
+  display: block;
+  color: #F49B38;
+  font-size: .8rem;
+  margin-bottom: .7rem;
+}
+
+.chatExample {
+  color: #EAE6DF;
+  font-family: monospace;
+  background: rgba(10, 8, 7, 0.9);
+  padding: .8rem;
+  border-radius: 8px;
+  border: 1px solid #33251c;
+}
+
+/* BOTONES */
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 1.5rem;
+}
+
+.buyBtn,
+.secondaryBtn,
+.backBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: .25s;
+}
+
+.buyBtn {
+  background: linear-gradient(135deg, #F49B38 0%, #b86b1b 100%);
+  color: #120e0c;
+  border: none;
+  box-shadow: 0 4px 12px rgba(244, 155, 56, 0.3);
+}
+
+.buyBtn:hover {
+  background: linear-gradient(135deg, #ffb35c 0%, #F49B38 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(244, 155, 56, 0.4);
+}
+
+.secondaryBtn,
+.backBtn {
+  background: transparent;
+  color: #F49B38;
+  border: 1px solid #4A2E1B;
+}
+
+.secondaryBtn:hover,
+.backBtn:hover {
+  background: rgba(244, 155, 56, 0.1);
+  border-color: #F49B38;
+  color: #ffb35c;
+}
+
+/* SEGUNDO PANEL */
+.benefitsHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.benefitsHeader h3 {
+  color: #EAE6DF;
+  font-size: 1.6rem;
+  margin: 0;
+}
+
+.details {
+  margin-top: 1rem;
+  color: #EAE6DF;
+  line-height: 1.6;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.details ul {
+  padding-left: 1rem;
+}
+
+.details li {
+  margin: .5rem 0;
+  color: #b3aea6;
+}
+
+.details li::before {
+  content: "✓ ";
+  color: #F49B38;
+}
+
+/* GLOW POR RANGO (Tonos adaptados a paleta cálida / madera / torii) */
+.modal.platino {
+  border-color: #b0a89f;
+  box-shadow: 0 0 25px rgba(176,168,159,.3), 0 20px 60px rgba(0,0,0,.8);
+}
+
+.modal.paladio {
+  border-color: #F49B38;
+  box-shadow: 0 0 25px rgba(244,155,56,.35), 0 20px 60px rgba(0,0,0,.8);
+}
+
+.modal.mithril {
+  border-color: #ffcb77;
+  box-shadow: 0 0 25px rgba(255,203,119,.35), 0 20px 60px rgba(0,0,0,.8);
+}
+
+.modal.titanio {
+  border-color: #c98bb9;
+  box-shadow: 0 0 25px rgba(201,139,185,.35), 0 20px 60px rgba(0,0,0,.8);
+}
+
+.modal.luminita {
+  border-color: #8A271E;
+  box-shadow: 0 0 25px rgba(138,39,30,.4), 0 20px 60px rgba(0,0,0,.8);
+}
+
+.rankHeader[data-rank="platino"] h2,
+.rankHeader[data-rank="platino"] .price { color: #b0a89f; }
+
+.rankHeader[data-rank="paladio"] h2,
+.rankHeader[data-rank="paladio"] .price { color: #F49B38; }
+
+.rankHeader[data-rank="mithril"] h2,
+.rankHeader[data-rank="mithril"] .price { color: #ffcb77; }
+
+.rankHeader[data-rank="titanio"] h2,
+.rankHeader[data-rank="titanio"] .price { color: #c98bb9; }
+
+.rankHeader[data-rank="luminita"] h2,
+.rankHeader[data-rank="luminita"] .price { color: #d94e42; }
+
+.rankHeader[data-rank="platino"] .rankBanner {
+  background: linear-gradient(135deg, #4a4542, #1f1b19);
+}
+
+.rankHeader[data-rank="paladio"] .rankBanner {
+  background: linear-gradient(135deg, #b86b1b, #4a2707);
+}
+
+.rankHeader[data-rank="mithril"] .rankBanner {
+  background: linear-gradient(135deg, #8a6a24, #3b2a09);
+}
+
+.rankHeader[data-rank="titanio"] .rankBanner {
+  background: linear-gradient(135deg, #5c2d52, #241120);
+}
+
+.rankHeader[data-rank="luminita"] .rankBanner {
+  background: linear-gradient(135deg, #8A271E, #380c09);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.chatRank {
+  font-weight: bold;
+}
+
+.rankHeader[data-rank="platino"] ~ .preview .chatRank { color: #b0a89f; }
+.rankHeader[data-rank="paladio"] ~ .preview .chatRank { color: #F49B38; }
+.rankHeader[data-rank="mithril"] ~ .preview .chatRank { color: #ffcb77; }
+.rankHeader[data-rank="titanio"] ~ .preview .chatRank { color: #c98bb9; }
+.rankHeader[data-rank="luminita"] ~ .preview .chatRank { color: #d94e42; }
+
+.chatExample p {
+  margin: 8px 0 0;
+  color: #EAE6DF;
+}
+
+.benefitGroup {
+  margin-bottom: 22px;
+}
+
+.benefitGroup h4 {
+  font-size: 16px;
+  margin-bottom: 10px;
+  color: #EAE6DF;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.benefitItem {
+  background: rgba(74, 46, 27, 0.2);
+  border: 1px solid #4A2E1B;
+  padding: 10px 14px;
+  margin-bottom: 8px;
+  border-radius: 10px;
+  color: #b3aea6;
+  font-size: 14px;
+  transition: all .2s ease;
+}
+
+.benefitItem:hover {
+  transform: translateY(-2px);
+  border-color: #F49B38;
+  background: rgba(74, 46, 27, 0.4);
+}
+
+.chatChannel { color: #8c8279; }
+.chatUser { color: #EAE6DF; font-weight: 600; }
+.chatArrow { color: #8c8279; }
+.chatMessage { font-weight: 500; }

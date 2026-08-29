@@ -1,0 +1,28 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(11, 9, 8, 0.8);
+  backdrop-filter: blur(6px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+.modal {
+  position: relative;
+  background: rgba(22, 18, 16, 0.95);
+  border: 1px solid #4A2E1B;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 550px;
+  padding: 2rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(244, 155, 56, 0.15);
+  color: #EAE6DF;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

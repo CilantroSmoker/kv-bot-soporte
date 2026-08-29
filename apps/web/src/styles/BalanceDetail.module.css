@@ -1,0 +1,171 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(11, 9, 8, 0.8);
+  backdrop-filter: blur(6px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn .2s ease;
+}
+
+.modal {
+  width: 90%;
+  max-width: 550px;
+  background: rgba(22, 18, 16, 0.96);
+  border: 1px solid #4A2E1B;
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0,0,0,.8), 0 0 30px rgba(244, 155, 56, 0.15);
+  color: #EAE6DF;
+}
+
+.closeBtn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: rgba(74, 46, 27, 0.4);
+  border: 1px solid #4A2E1B;
+  color: #EAE6DF;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  z-index: 10;
+  transition: all 0.2s;
+}
+
+.closeBtn:hover {
+  background: #8A271E;
+  border-color: #8A271E;
+}
+
+.panel {
+  padding: 1.8rem;
+}
+
+.rankBanner {
+  height: 100px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1.2rem;
+  background: linear-gradient(
+    135deg,
+    #4a2f0a,
+    #161004
+  ); /* Degradado de ámbar/madera japonesa a negro oscuro */
+  border: 1px solid rgba(244, 155, 56, 0.35);
+  overflow: hidden;
+}
+
+.rankBanner span {
+  color: #F49B38; /* Dorado atardecer cálido */
+  font-size: 1.2rem;
+  letter-spacing: 4px;
+  font-weight: 900;
+  text-shadow: 0 0 15px rgba(244, 155, 56, 0.5);
+}
+
+.productIconContainer {
+  display: flex;
+  justify-content: center;
+  margin: 10px 0;
+  color: #F49B38;
+  filter: drop-shadow(0 0 10px rgba(244, 155, 56, 0.4));
+}
+
+.rankHeader {
+  text-align: center;
+}
+
+.rankHeader h2 {
+  margin: .5rem 0;
+  color: #EAE6DF;
+  font-size: 1.8rem;
+}
+
+.price {
+  color: #F49B38;
+  font-size: 2rem;
+  font-weight: bold;
+  margin: 0.8rem 0;
+}
+
+.rankHeader p {
+  color: #b3aea6;
+  line-height: 1.5;
+  font-size: 0.95rem;
+}
+
+.productSection {
+  margin-top: 1.5rem;
+  background: rgba(15, 12, 10, 0.8);
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid #4A2E1B;
+}
+
+.productSectionTitle {
+  display: block;
+  color: #F49B38;
+  font-size: .85rem;
+  margin-bottom: .7rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.productList {
+  padding-left: 1.2rem;
+  color: #b3aea6;
+  margin: 0;
+}
+
+.productList li {
+  margin: .4rem 0;
+  font-size: 0.9rem;
+}
+
+.productList li::before {
+  content: "✓ ";
+  color: #F49B38;
+  font-weight: bold;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 1.5rem;
+}
+
+.buyBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: .25s;
+  background: linear-gradient(135deg, #F49B38 0%, #b86b1b 100%);
+  color: #120e0c;
+  border: none;
+  box-shadow: 0 4px 12px rgba(244, 155, 56, 0.3);
+}
+
+.buyBtn:hover {
+  background: linear-gradient(135deg, #ffb35c 0%, #F49B38 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(244, 155, 56, 0.4);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

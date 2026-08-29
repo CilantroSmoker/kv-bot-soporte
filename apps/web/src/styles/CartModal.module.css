@@ -1,0 +1,451 @@
+.cartOverlay {
+  position: fixed;
+
+  top: 75px;
+  right: 0;
+  left: auto;
+
+  width: 100%;
+  height: calc(100% - 75px);
+
+  background: rgba(0, 0, 0, 0.75);
+
+  backdrop-filter: blur(4px);
+
+  z-index: 999;
+
+  display: flex;
+  justify-content: flex-end;
+
+  animation: cartOverlayIn 0.28s ease-out both;
+}
+
+
+.cartContainer {
+  background:
+    linear-gradient(
+      145deg,
+      rgba(25, 20, 16, 0.98),
+      rgba(10, 9, 8, 0.98)
+    );
+
+  border-left: 1px solid #4A2E1B;
+
+  width: 100%;
+  max-width: 400px;
+  height: 100%;
+
+  overflow-y: auto;
+
+  padding: 1.5rem;
+
+  display: flex;
+  flex-direction: column;
+
+  z-index: 1000;
+
+  box-shadow:
+    -8px 0 24px rgba(0, 0, 0, 0.6),
+    -12px 0 40px rgba(200, 155, 60, 0.04);
+
+  animation: cartPanelIn 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.cartHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 1.5rem;
+
+  border-bottom: 1px solid rgba(138, 39, 30, 0.8);
+
+  padding-bottom: 1rem;
+}
+
+
+.cartTitle {
+  display: flex;
+  align-items: center;
+
+  gap: 0.5rem;
+
+  color: #F49B38;
+
+  font-size: 1.2rem;
+  font-weight: bold;
+
+  animation: cartContentIn 0.45s 0.08s ease-out both;
+}
+
+
+.closeButton {
+  background: none;
+  border: none;
+
+  color: #b3aea6;
+
+  cursor: pointer;
+
+  font-size: 1.5rem;
+
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+
+.closeButton:hover {
+  color: #EAE6DF;
+
+  transform: rotate(90deg);
+}
+
+
+/* =========================================================
+   EMPTY
+   ========================================================= */
+
+.emptyCart {
+  text-align: center;
+
+  color: #b3aea6;
+
+  margin-top: 2rem;
+
+  font-size: 0.95rem;
+
+  animation: cartContentIn 0.45s 0.15s ease-out both;
+}
+
+
+/* =========================================================
+   LISTA
+   ========================================================= */
+
+.cartList {
+  flex: 1;
+
+  overflow-y: auto;
+
+  margin-bottom: 1rem;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 0.75rem;
+}
+
+
+/* =========================================================
+   ITEM
+   ========================================================= */
+
+.cartItemRow {
+  background:
+    linear-gradient(
+      145deg,
+      rgba(74, 46, 27, 0.34),
+      rgba(35, 25, 19, 0.34)
+    );
+
+  border: 1px solid #4A2E1B;
+
+  padding: 1rem;
+
+  border-radius: 8px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  animation: cartItemIn 0.4s ease-out both;
+
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+
+.cartItemRow:hover {
+  transform: translateX(-3px);
+
+  border-color: rgba(200, 155, 60, 0.55);
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(74, 46, 27, 0.44),
+      rgba(35, 25, 19, 0.44)
+    );
+
+  box-shadow:
+    0 5px 18px rgba(0, 0, 0, 0.28);
+}
+
+
+.cartItemInfo h4 {
+  color: #EAE6DF;
+
+  margin: 0 0 0.25rem 0;
+
+  font-size: 0.95rem;
+}
+
+
+.cartItemInfo small {
+  color: #b3aea6;
+
+  font-size: 0.8rem;
+}
+
+
+.cartItemPrice {
+  color: #F49B38;
+
+  font-weight: bold;
+
+  font-size: 1rem;
+}
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.cartFooter {
+  border-top: 1px solid #4A2E1B;
+
+  padding-top: 1rem;
+
+  margin-bottom: 1rem;
+
+  animation: cartContentIn 0.45s 0.16s ease-out both;
+}
+
+
+.cartTotal {
+  display: flex;
+
+  justify-content: space-between;
+
+  color: #EAE6DF;
+
+  font-size: 1.1rem;
+
+  font-weight: bold;
+
+  margin-bottom: 1rem;
+}
+
+
+.cartTotal span:last-child {
+  color: #F49B38;
+
+  text-shadow:
+    0 0 12px rgba(244, 155, 56, 0.18);
+}
+
+
+/* =========================================================
+   CHECKOUT
+   ========================================================= */
+
+.checkoutButton {
+  width: 100%;
+
+  padding: 1rem;
+
+  color: #120e0c;
+
+  border: none;
+
+  border-radius: 6px;
+
+  font-size: 1rem;
+
+  font-weight: bold;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    background 0.25s ease;
+
+  animation: cartButtonIn 0.45s 0.22s ease-out both;
+}
+
+
+.checkoutButton:not(:disabled) {
+  background:
+    linear-gradient(
+      135deg,
+      #F49B38 0%,
+      #b86b1b 100%
+    );
+
+  box-shadow:
+    0 4px 12px rgba(244, 155, 56, 0.3);
+}
+
+
+.checkoutButton:not(:disabled):hover {
+  transform: translateY(-2px);
+
+  background:
+    linear-gradient(
+      135deg,
+      #ffb35c 0%,
+      #F49B38 100%
+    );
+
+  box-shadow:
+    0 6px 20px rgba(244, 155, 56, 0.4);
+}
+
+
+.checkoutButton:not(:disabled):active {
+  transform: translateY(0);
+}
+
+
+.checkoutButton:disabled {
+  background: #332924;
+
+  color: #665c54;
+
+  cursor: not-allowed;
+}
+
+
+/* =========================================================
+   ANIMACIONES
+   ========================================================= */
+
+@keyframes cartOverlayIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+
+@keyframes cartPanelIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+
+@keyframes cartContentIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+@keyframes cartItemIn {
+  from {
+    opacity: 0;
+    transform: translateX(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+
+@keyframes cartButtonIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+/* =========================================================
+   ACCESIBILIDAD
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .cartOverlay,
+  .cartContainer,
+  .cartTitle,
+  .emptyCart,
+  .cartItemRow,
+  .cartFooter,
+  .checkoutButton {
+    animation: none;
+  }
+
+  .cartItemRow,
+  .closeButton,
+  .checkoutButton {
+    transition: none;
+  }
+}
+
+/* =========================================================
+   CIERRE DEL CARRITO
+   ========================================================= */
+
+.cartOverlayClosing {
+  animation: cartOverlayOut 0.32s ease-in both;
+}
+
+.cartContainerClosing {
+  animation: cartPanelOut 0.32s cubic-bezier(0.55, 0, 1, 0.45) both;
+}
+
+@keyframes cartOverlayOut {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes cartPanelOut {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+

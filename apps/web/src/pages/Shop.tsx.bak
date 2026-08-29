@@ -1,0 +1,387 @@
+import { useState, useEffect } from 'react';
+import MinecraftModal from "../components/MinecraftModal";
+import EmailModal from "../components/EmailModal";
+import { useAuth } from '../context/AuthContext'; 
+import { apiFetch } from '../services/api'; 
+import { ShoppingCart, Trash2, X, Crown, Coins, Key, Gamepad2 } from 'lucide-react';
+import styles from '../styles/Shop.module.css'; 
+import AgeVerificationModal from '../components/AgeVerificationModal';
+import cartStyles from '../styles/CartModal.module.css'; 
+import { useToast } from '../hooks/useToast'; 
+import ShopInfo from '../components/ShopInfo';
+import { ToastNotification } from '../components/ToastNotification'; 
+import SuccessModal from '../components/SuccessModal';
+import RankDetailModal from '../components/RankDetailModal'; 
+import Footer from '../components/Footer';
+import Navbar from '../components/Navbar';
+import '../styles/animations.css';
+
+export interface Product { 
+  id: string; 
+  name: string; 
+  description: string; 
+  price: number; 
+  type: string;
+  details?: string;
+}
+
+interface CartItem {
+  product: Product;
+  quantity: number;
+}
+
+export default function ShopContainer() {  
+  const { sessionToken, user, loading, refreshUser,} = useAuth();
+  const [products, setProducts] = useState<Product[]>([]);  
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [minecraftModalOpen, setMinecraftModalOpen] = useState(false);
+  const [emailModalOpen, setEmailModalOpen] = useState(false);  
+  const { sessionToken, user, loading, refreshUser } = useAuth();
+  const [successMessage, setSuccessMessage] = useState("");
+  const [activeTab, setActiveTab] = useState<'RANK' | 'BALANCE' | 'KEY'>('RANK');  
+  const [cartExpanded, setCartExpanded] = useState(false);
+  const { toasts, showNotification } = useToast();    
+  const [selectedRank, setSelectedRank] = useState<Product | null>(null);
+
+  // Estados para controlar tu nuevo modal animado
+  const [isSuccessOpen, setIsSuccessOpen] = useState(false);
+  const handleLinkMinecraft = () => {
+    setMinecraftModalOpen(true);
+};
+
+const handleLinkEmail = () => {
+    setEmailModalOpen(true);
+};
+
+  useEffect(() => {
+    if (sessionToken) {
+      apiFetch('/products')
+        .then(data => setProducts(data))
+        .catch(err => console.error("Error al cargar productos", err));
+    }
+  }, [sessionToken]);
+
+  const [ageVerified, setAgeVerified] = useState(() => {
+    return localStorage.getItem('ageVerified') === 'true';
+  });
+
+  const handleAgeVerified = (dateOfBirth: string) => {
+    localStorage.setItem('userDOB', dateOfBirth);
+    localStorage.setItem('ageVerified', 'true');
+    setAgeVerified(true);
+  };
+
+  const addToCart = (product: Product) => {
+    showNotification(product.name);
+    setCart(prev => {
+      const existing = prev.find(item => item.product.id === product.id);
+      if (existing) {
+        return prev.map(item => item.product.id === product.id ? { ...item, quantity: item.quantity + 1 } : item);
+      }
+      return [...prev, { product, quantity: 1 }];
+    });
+  };
+
+
+  const removeFromCart = (productId: string) => {
+    setCart(prev => prev.filter(item => item.product.id !== productId));
+  };
+
+const [minecraftModalOpen, setMinecraftModalOpen] = useState(false);
+
+const handleLinkMinecraft = () => {
+  setMinecraftModalOpen(true);
+};
+
+const handleLinkEmail = () => {
+  console.log("Abrir modal email");
+};
+
+const handleCheckout = async () => {
+  if (!user?.minecraftUsername) {
+    alert('⚠ Debes vincular tu cuenta de Minecraft');
+    return;
+  }
+
+  if (!user?.email) {
+    alert('⚠ Debes registrar tu email antes de comprar');
+    return;
+  }
+
+  try {
+    const result = await apiFetch('/orders', {
+      method: 'POST',
+      body: JSON.stringify({
+        items: cart.map(item => ({
+          productId: item.product.id,
+          quantity: item.quantity
+        }))
+      })
+    });
+
+    setCart([]);
+    window.location.href = result.paymentUrl;
+
+  } catch (err: any) {
+    alert(`Error: ${err.message}`);
+  }
+};
+
+  if (!ageVerified) {
+    return <AgeVerificationModal onVerified={handleAgeVerified} />;
+  }
+
+  if (loading) {
+    return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', color: '#e0e0e0' }}>Cargando...</div>;
+  }
+
+  if (!sessionToken) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', color: '#e0e0e0', flexDirection: 'column' }}>
+        <Gamepad2 size={48} color="#1e88e5" />
+        <h2>Koshi Village Shop</h2>
+        <p>Genera un enlace desde Discord para entrar</p>
+      </div>
+    );
+  }
+
+  const totalCart = cart.reduce((acc, item) => acc + (item.product.price * item.quantity), 0);
+  const cartItemsCount = cart.reduce((acc, item) => acc + item.quantity, 0);
+	console.log("USER SHOP:", user);
+	return (
+  <div>
+
+    <Navbar
+      username={user?.discordUsername ?? undefined}
+      minecraftUsername={user?.minecraftUsername}
+      email={user?.email}
+      cartItemsCount={cartItemsCount}
+      cartExpanded={cartExpanded}
+      setCartExpanded={setCartExpanded}
+      onLinkMinecraft={handleLinkMinecraft}
+      onLinkEmail={handleLinkEmail}
+    />
+
+    {minecraftModalOpen && (
+      <MinecraftModal
+        currentUsername={user?.minecraftUsername}
+        onClose={() => setMinecraftModalOpen(false)}
+        onSuccess={async () => {
+          await refreshUser();
+          setSuccessMessage("¡Cuenta de Minecraft vinculada!");
+          setIsSuccessOpen(true);
+        }}
+      />
+    )}
+
+    {emailModalOpen && (
+      <EmailModal
+        currentEmail={user?.email}
+        onClose={() => setEmailModalOpen(false)}
+        onSuccess={async () => {
+          await refreshUser();
+          setSuccessMessage("¡Email vinculado correctamente!");
+          setIsSuccessOpen(true);
+        }}
+      />
+    )}
+
+    <ShopInfo />
+	<section id="products">
+	  {/* TABS */}
+	<div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', flexWrap: 'wrap' }}>		 
+	 <button   
+	    onClick={() => setActiveTab('RANK')}
+	    style={{
+	      padding: '0.75rem 1.5rem',
+	      background: activeTab === 'RANK' ? '#1e88e5' : '#0f3460',
+	      color: '#e0e0e0',
+	      border: `2px solid ${activeTab === 'RANK' ? '#1e88e5' : '#1e88e5'}`,
+	      borderRadius: '4px',
+	      cursor: 'pointer',
+	      fontWeight: 'bold',
+	      transition: 'all 0.3s',
+	      display: 'flex',
+	      alignItems: 'center',
+	      gap: '0.5rem' // Espacio entre el icono y el texto
+	    }}
+	  >
+	    <Crown size={18} />
+	    Rangos
+	  </button>
+	  <button   
+	    onClick={() => setActiveTab('BALANCE')}
+	    style={{
+	      padding: '0.75rem 1.5rem',
+	      background: activeTab === 'BALANCE' ? '#1e88e5' : '#0f3460',
+	      color: '#e0e0e0',
+	      border: `2px solid ${activeTab === 'BALANCE' ? '#1e88e5' : '#1e88e5'}`,
+	      borderRadius: '4px',
+	      cursor: 'pointer',
+	      fontWeight: 'bold',
+	      transition: 'all 0.3s',
+	      display: 'flex',
+	      alignItems: 'center',
+	      gap: '0.5rem'		   
+	     }}
+	  >
+	    <Coins size={18} />
+	    Balance
+	  </button>
+	  <button   
+	    onClick={() => setActiveTab('KEY')}
+	    style={{
+	      padding: '0.75rem 1.5rem',
+	      background: activeTab === 'KEY' ? '#1e88e5' : '#0f3460',
+	      color: '#e0e0e0',
+	      border: `2px solid ${activeTab === 'KEY' ? '#1e88e5' : '#1e88e5'}`,
+	      borderRadius: '4px',
+	      cursor: 'pointer',
+	      fontWeight: 'bold',
+	      transition: 'all 0.3s',
+	      display: 'flex',
+	      alignItems: 'center',
+	      gap: '0.5rem'
+	    }}
+	  >
+	    <Key size={18} />
+	    Llaves
+	  </button>
+	</div>
+	<h2 className={styles.sectionTitle} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+	  {activeTab === 'RANK' && (
+	    <>
+	      <Crown size={24} />
+	      <span>Rangos Disponibles</span>
+	    </>
+	  )}
+	  {activeTab === 'BALANCE' && (
+	    <>
+	      <Coins size={24} />
+	      <span>Balance Disponible</span>
+	    </>
+	  )}
+	  {activeTab === 'KEY' && (
+	    <>
+	      <Key size={24} />
+	      <span>Llaves Disponibles</span>
+	    </>
+	  )}
+	</h2>
+        <div className={styles.cardsGrid}>
+	  {products.filter(p => p.type === activeTab).map(product => (
+	    <div 
+	      key={product.id} 
+	      className={styles.productCard}
+	      onClick={() => setSelectedRank(product)}
+	      style={{ cursor: 'pointer' }}
+	    >
+	      <span className={styles.cardBadge}>{product.type}</span>
+	      <h3 className={styles.cardTitle}>{product.name}</h3>
+	      <p className={styles.cardDescription}>{product.description}</p>
+	      <div className={styles.cardPrice}>${Number(product.price).toFixed(2)}</div>
+	      <button onClick={() => setSelectedRank(product)} className={styles.btnAdd}> 
+ 	        Mostrar Detalles 
+	      </button>
+	    </div>
+	  ))}
+	</div>
+	</section>
+        {cartExpanded && (
+          <div  
+            className={cartStyles.cartOverlay}
+            onClick={() => setCartExpanded(false)}
+          >
+            <div  
+              className={cartStyles.cartContainer}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className={cartStyles.cartHeader}>
+                <div className={cartStyles.cartTitle}>
+                  <ShoppingCart size={24} />
+                  Carrito
+                </div>
+                <button  
+                  onClick={() => setCartExpanded(false)}
+                  className={cartStyles.closeButton}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "#ffffff",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: "0.5rem",
+                    borderRadius: "50%",
+                    transition: "background 0.2s ease"
+                  }}
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              {cart.length === 0 ? (
+                <div className={cartStyles.emptyCart}>El carrito está vacío</div>
+              ) : (
+                <>
+                  <div className={cartStyles.cartList}>
+                    {cart.map(item => (
+                      <div key={item.product.id} className={cartStyles.cartItemRow}>
+                        <div className={cartStyles.cartItemInfo}>
+                          <h4>{item.product.name}</h4>
+                          <small>${Number(item.product.price).toFixed(2)} × {item.quantity}</small>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'flex-end' }}>
+                          <div className={cartStyles.cartItemPrice}>${(item.product.price * item.quantity).toFixed(2)}</div>
+                          <button
+                            onClick={() => removeFromCart(item.product.id)}
+                            style={{ background: 'none', border: 'none', color: '#ff6b6b', cursor: 'pointer', padding: 0 }}
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className={cartStyles.cartFooter}>
+                    <div className={cartStyles.cartTotal}>
+                      <span>Total:</span>
+                      <span>${Number(totalCart).toFixed(2)}</span>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={handleCheckout}
+                    className={cartStyles.checkoutButton}
+                    disabled={!user?.minecraftUsername || !user?.email}
+                  >
+                    Confirmar Orden
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+        <ToastNotification toasts={toasts} />
+
+      {selectedRank && (
+        <RankDetailModal 
+          rank={selectedRank} 
+          onClose={() => setSelectedRank(null)} 
+          addToCart={addToCart} 
+        />
+      )}
+
+     <SuccessModal
+    isOpen={isSuccessOpen}
+    message={successMessage}
+    onClose={() => setIsSuccessOpen(false)}
+    />
+      <Footer />
+
+    </div>
+);
+
+}

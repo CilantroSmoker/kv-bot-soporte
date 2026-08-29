@@ -1,0 +1,816 @@
+import { useState, useEffect } from "react";
+
+import {
+  ShoppingCart,
+  Trash2,
+  X,
+  Crown,
+  Coins,
+  Key,
+  Gamepad2,
+} from "lucide-react";
+
+import MinecraftModal from "../components/MinecraftModal";
+import EmailModal from "../components/EmailModal";
+import SuccessModal from "../components/SuccessModal";
+import AgeVerificationModal from "../components/AgeVerificationModal";
+import ShopInfo from "../components/ShopInfo";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
+import ProductDetailModal from "../components/ProductDetailModal";
+import ProductCard from "../components/ProductCard";
+import { ToastNotification } from "../components/ToastNotification";
+
+import { useAuth } from "../context/AuthContext";
+import { useCart } from "../context/CartContext";
+import { apiFetch } from "../services/api";
+
+import { useToast } from "../hooks/useToast";
+
+import styles from "../styles/Shop.module.css";
+import cartStyles from "../styles/CartModal.module.css";
+
+import "../styles/animations.css";
+
+export interface Product {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  type: string;
+  details?: string;
+}
+
+export default function ShopContainer() {
+  const {
+    sessionToken,
+    user,
+    loading,
+    refreshUser,
+  } = useAuth();
+
+  const {
+    cart,
+    totalCart,
+    cartExpanded,
+    setCartExpanded,
+    addToCart,
+    removeFromCart,
+    clearCart,
+  } = useCart();
+
+  const [products, setProducts] = useState<Product[]>([]);
+
+  const [minecraftModalOpen, setMinecraftModalOpen] =
+    useState(false);
+
+  const [emailModalOpen, setEmailModalOpen] =
+    useState(false);
+
+  const [successMessage, setSuccessMessage] =
+    useState("");
+
+  const [isSuccessOpen, setIsSuccessOpen] =
+    useState(false);
+
+  const [activeTab, setActiveTab] = useState<
+    "RANK" | "BALANCE" | "KEY"
+  >("RANK");
+
+  const [selectedProduct, setSelectedProduct] =
+  useState<Product | null>(null);
+
+  const [cartClosing, setCartClosing] =
+  useState(false);
+  const { toasts, showNotification } = useToast();
+
+  const closeCart = () => {
+  setCartClosing(true);
+
+  setTimeout(() => {
+    setCartExpanded(false);
+    setCartClosing(false);
+  }, 320);
+};
+
+  useEffect(() => {
+    if (!sessionToken) return;
+
+    apiFetch("/products")
+      .then((data) => {
+        setProducts(data);
+      })
+      .catch((err) => {
+        console.error(
+          "Error al cargar productos",
+          err
+        );
+      });
+  }, [sessionToken]);
+
+  /*
+   * =========================================================
+   * VERIFICACIÓN DE EDAD
+   * =========================================================
+   */
+
+  const [ageVerified, setAgeVerified] =
+    useState(() => {
+      return (
+        localStorage.getItem("ageVerified") ===
+        "true"
+      );
+    });
+
+  const handleAgeVerified = (
+    dateOfBirth: string
+  ) => {
+    localStorage.setItem(
+      "userDOB",
+      dateOfBirth
+    );
+
+    localStorage.setItem(
+      "ageVerified",
+      "true"
+    );
+
+    setAgeVerified(true);
+  };
+
+  /*
+   * =========================================================
+   * VINCULAR MINECRAFT
+   * =========================================================
+   */
+
+  const handleLinkMinecraft = () => {
+    setMinecraftModalOpen(true);
+  };
+
+  /*
+   * =========================================================
+   * VINCULAR EMAIL
+   * =========================================================
+   */
+
+  const handleLinkEmail = () => {
+    setEmailModalOpen(true);
+  };
+
+  /*
+   * =========================================================
+   * AGREGAR AL CARRITO
+   * =========================================================
+   */
+
+  const handleAddToCart = (
+    product: Product
+  ) => {
+    showNotification(product.name);
+    addToCart(product);
+  };
+
+  /*
+   * =========================================================
+   * CHECKOUT
+   * =========================================================
+   */
+
+  const handleCheckout = async () => {
+    if (!user?.minecraftUsername) {
+      alert(
+        "⚠ Debes vincular tu cuenta de Minecraft"
+      );
+      return;
+    }
+
+    if (!user?.email) {
+      alert(
+        "⚠ Debes registrar tu email antes de comprar"
+      );
+      return;
+    }
+
+    if (cart.length === 0) {
+      alert("⚠ El carrito está vacío");
+      return;
+    }
+
+    try {
+      const result = await apiFetch(
+        "/orders",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            items: cart.map((item) => ({
+              productId:
+                item.product.id,
+              quantity:
+                item.quantity,
+            })),
+          }),
+        }
+      );
+
+      clearCart();
+      setCartExpanded(false);
+
+      window.location.href =
+        result.paymentUrl;
+    } catch (err: any) {
+      alert(
+        `Error: ${err.message}`
+      );
+    }
+  };
+
+  /*
+   * =========================================================
+   * EDAD
+   * =========================================================
+   */
+
+  if (!ageVerified) {
+    return (
+      <AgeVerificationModal
+        onVerified={handleAgeVerified}
+      />
+    );
+  }
+
+  /*
+   * =========================================================
+   * LOADING
+   * =========================================================
+   */
+
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "100vh",
+          color: "#e0e0e0",
+          background: "#090706",
+        }}
+      >
+        Cargando...
+      </div>
+    );
+  }
+
+  /*
+   * =========================================================
+   * SIN SESIÓN
+   * =========================================================
+   */
+
+  if (!sessionToken) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "100vh",
+          color: "#e0e0e0",
+          background: "#090706",
+          flexDirection: "column",
+          gap: "0.75rem",
+        }}
+      >
+        <Gamepad2
+          size={48}
+          color="#c89b3c"
+        />
+
+        <h2>
+          Koshi Village Shop
+        </h2>
+
+        <p>
+          Genera un enlace desde Discord
+          para entrar
+        </p>
+      </div>
+    );
+  }
+
+  /*
+   * =========================================================
+   * SHOP
+   * =========================================================
+   */
+
+  return (
+    <div>
+      {/* =====================================================
+          NAVBAR
+          ===================================================== */}
+
+      <Navbar
+        username={
+          user?.discordUsername ??
+          undefined
+        }
+        minecraftUsername={
+          user?.minecraftUsername
+        }
+        email={user?.email}
+        onLinkMinecraft={
+          handleLinkMinecraft
+        }
+        onLinkEmail={
+          handleLinkEmail
+        }
+      />
+
+      {/* =====================================================
+          MODAL MINECRAFT
+          ===================================================== */}
+
+      {minecraftModalOpen && (
+        <MinecraftModal
+          currentUsername={
+            user?.minecraftUsername
+          }
+          onClose={() =>
+            setMinecraftModalOpen(false)
+          }
+          onSuccess={async () => {
+            await refreshUser();
+
+            setSuccessMessage(
+              "¡Cuenta de Minecraft vinculada!"
+            );
+
+            setIsSuccessOpen(true);
+          }}
+        />
+      )}
+
+      {/* =====================================================
+          MODAL EMAIL
+          ===================================================== */}
+
+      {emailModalOpen && (
+        <EmailModal
+          currentEmail={
+            user?.email
+          }
+          onClose={() =>
+            setEmailModalOpen(false)
+          }
+          onSuccess={async () => {
+            await refreshUser();
+
+            setSuccessMessage(
+              "¡Email vinculado correctamente!"
+            );
+
+            setIsSuccessOpen(true);
+          }}
+        />
+      )}
+
+      {/* =====================================================
+          SHOP INFO
+          ===================================================== */}
+
+      <ShopInfo />
+
+      {/* =====================================================
+          PRODUCTOS
+          ===================================================== */}
+
+      <section
+        id="products"
+        style={{
+          marginTop: "4rem",
+        }}
+      >
+        {/* ===================================================
+            TABS
+            =================================================== */}
+
+        <div
+          className={
+            styles.shopTabs
+          }
+        >
+          <button
+            className={`
+              ${styles.shopTab}
+              ${
+                activeTab === "RANK"
+                  ? styles.shopTabActive
+                  : ""
+              }
+            `}
+            onClick={() =>
+              setActiveTab("RANK")
+            }
+          >
+            <Crown size={18} />
+            <span>Rangos</span>
+          </button>
+
+          <button
+            className={`
+              ${styles.shopTab}
+              ${
+                activeTab === "BALANCE"
+                  ? styles.shopTabActive
+                  : ""
+              }
+            `}
+            onClick={() =>
+              setActiveTab("BALANCE")
+            }
+          >
+            <Coins size={18} />
+            <span>Balance</span>
+          </button>
+
+          <button
+            className={`
+              ${styles.shopTab}
+              ${
+                activeTab === "KEY"
+                  ? styles.shopTabActive
+                  : ""
+              }
+            `}
+            onClick={() =>
+              setActiveTab("KEY")
+            }
+          >
+            <Key size={18} />
+            <span>Llaves</span>
+          </button>
+        </div>
+
+        {/* ===================================================
+            TÍTULO
+            =================================================== */}
+
+        <h2
+          className={
+            styles.sectionTitle
+          }
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "0.5rem",
+          }}
+        >
+          {activeTab === "RANK" && (
+            <>
+              <Crown size={24} />
+              <span>
+                Rangos Disponibles
+              </span>
+            </>
+          )}
+
+          {activeTab === "BALANCE" && (
+            <>
+              <Coins size={24} />
+              <span>
+                Balance Disponible
+              </span>
+            </>
+          )}
+
+          {activeTab === "KEY" && (
+            <>
+              <Key size={24} />
+              <span>
+                Llaves Disponibles
+              </span>
+            </>
+          )}
+        </h2>
+
+        {/* ===================================================
+            GRID
+            =================================================== */}
+
+        <div className={styles.cardsGrid}>
+          {products
+            .filter(
+              (product) =>
+                product.type === activeTab
+            )
+            .map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                onSelect={setSelectedProduct}
+              />
+            ))}
+        </div>
+      </section>
+
+      {/* =====================================================
+          CARRITO
+          ===================================================== */}
+
+      {cartExpanded && (
+  <div
+    className={`${cartStyles.cartOverlay} ${
+      cartClosing
+        ? cartStyles.cartOverlayClosing
+        : ""
+    }`}
+    onClick={closeCart}
+  >
+    <div
+      className={`${cartStyles.cartContainer} ${
+        cartClosing
+          ? cartStyles.cartContainerClosing
+          : ""
+      }`}
+      onClick={(e) =>
+        e.stopPropagation()
+      }
+    >
+      {/* HEADER */}
+
+      <div
+        className={
+          cartStyles.cartHeader
+        }
+      >
+              <div
+                className={
+                  cartStyles.cartTitle
+                }
+              >
+                <ShoppingCart
+                  size={24}
+                />
+
+                Carrito
+              </div>
+
+              <button
+		  onClick={closeCart}
+		  className={
+		    cartStyles.closeButton
+		  }
+		  style={{
+		    background:
+		      "none",
+		    border: "none",
+		    color:
+		      "#ffffff",
+		    cursor:
+		      "pointer",
+		    display:
+		      "flex",
+		    alignItems:
+		      "center",
+		    justifyContent:
+		      "center",
+		    padding:
+		      "0.5rem",
+		    borderRadius:
+		      "50%",
+		    transition:
+		      "background 0.2s ease",
+		  }}
+		>
+		  <X size={20} />
+		</button>
+            </div>
+
+            {/* CARRITO VACÍO */}
+
+            {cart.length ===
+            0 ? (
+              <div
+                className={
+                  cartStyles.emptyCart
+                }
+              >
+                El carrito está vacío
+              </div>
+            ) : (
+              <>
+                {/* PRODUCTOS */}
+
+                <div
+                  className={
+                    cartStyles.cartList
+                  }
+                >
+                  {cart.map(
+                    (item) => (
+                      <div
+                        key={
+                          item
+                            .product
+                            .id
+                        }
+                        className={
+                          cartStyles.cartItemRow
+                        }
+                      >
+                        <div
+                          className={
+                            cartStyles.cartItemInfo
+                          }
+                        >
+                          <h4>
+                            {
+                              item
+                                .product
+                                .name
+                            }
+                          </h4>
+
+                          <small>
+                            $
+                            {Number(
+                              item
+                                .product
+                                .price
+                            ).toFixed(
+                              2
+                            )}{" "}
+                            ×{" "}
+                            {
+                              item.quantity
+                            }
+                          </small>
+                        </div>
+
+                        <div
+                          style={{
+                            display:
+                              "flex",
+                            flexDirection:
+                              "column",
+                            gap:
+                              "0.5rem",
+                            alignItems:
+                              "flex-end",
+                          }}
+                        >
+                          <div
+                            className={
+                              cartStyles.cartItemPrice
+                            }
+                          >
+                            $
+                            {(
+                              item
+                                .product
+                                .price *
+                              item.quantity
+                            ).toFixed(
+                              2
+                            )}
+                          </div>
+
+                          <button
+                            onClick={() =>
+                              removeFromCart(
+                                item
+                                  .product
+                                  .id
+                              )
+                            }
+                            style={{
+                              background:
+                                "none",
+                              border:
+                                "none",
+                              color:
+                                "#ff6b6b",
+                              cursor:
+                                "pointer",
+                              padding:
+                                0,
+                            }}
+                            aria-label={`Eliminar ${item.product.name}`}
+                          >
+                            <Trash2
+                              size={
+                                16
+                              }
+                            />
+                          </button>
+                        </div>
+                      </div>
+                    )
+                  )}
+                </div>
+
+                {/* TOTAL */}
+
+                <div
+                  className={
+                    cartStyles.cartFooter
+                  }
+                >
+                  <div
+                    className={
+                      cartStyles.cartTotal
+                    }
+                  >
+                    <span>
+                      Total:
+                    </span>
+
+                    <span>
+                      $
+                      {Number(
+                        totalCart
+                      ).toFixed(
+                        2
+                      )}
+                    </span>
+                  </div>
+                </div>
+
+                {/* CHECKOUT */}
+
+                <button
+                  onClick={
+                    handleCheckout
+                  }
+                  className={
+                    cartStyles.checkoutButton
+                  }
+                  disabled={
+                    !user?.minecraftUsername ||
+                    !user?.email
+                  }
+                >
+                  Confirmar Orden
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* =====================================================
+          TOASTS
+          ===================================================== */}
+
+      <ToastNotification
+        toasts={toasts}
+      />
+
+      {/* =====================================================
+          PRODUCT DETAIL
+          ===================================================== */}
+
+      {selectedProduct && (
+        <ProductDetailModal
+          product={
+            selectedProduct
+          }
+          onClose={() =>
+            setSelectedProduct(
+              null
+            )
+          }
+          addToCart={
+            handleAddToCart
+          }
+        />
+      )}
+
+      {/* =====================================================
+          SUCCESS
+          ===================================================== */}
+
+      <SuccessModal
+        isOpen={
+          isSuccessOpen
+        }
+        message={
+          successMessage
+        }
+        onClose={() =>
+          setIsSuccessOpen(
+            false
+          )
+        }
+      />
+
+      {/* =====================================================
+          FOOTER
+          ===================================================== */}
+
+      <Footer />
+    </div>
+  );
+}

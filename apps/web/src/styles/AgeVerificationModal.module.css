@@ -1,0 +1,109 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(11, 9, 8, 0.85);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.modal {
+  background: linear-gradient(135deg, #1c1511 0%, #120e0c 100%);
+  border: 2px solid #8A271E;
+  border-radius: 12px;
+  padding: 2.5rem;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  color: #EAE6DF;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.7);
+}
+
+.modal h2 {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  color: #F49B38;
+  letter-spacing: 0.5px;
+}
+
+.modal p {
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+  color: #b3aea6;
+}
+
+.formGroup {
+  margin: 2rem 0;
+  text-align: left;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #F49B38;
+  font-size: 0.9rem;
+}
+
+.formGroup input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #4A2E1B;
+  border-radius: 6px;
+  background: rgba(22, 18, 16, 0.8);
+  color: #EAE6DF;
+  font-size: 1rem;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+}
+
+.formGroup input:focus {
+  outline: none;
+  border-color: #F49B38;
+  box-shadow: 0 0 10px rgba(244, 155, 56, 0.25);
+  background: rgba(244, 155, 56, 0.03);
+}
+
+.error {
+  color: #e06d65;
+  font-size: 0.9rem;
+  margin: 1rem 0;
+  font-weight: 600;
+}
+
+.verifyBtn {
+  background: linear-gradient(135deg, #F49B38 0%, #b86b1b 100%);
+  color: #120e0c;
+  border: none;
+  padding: 0.75rem 2rem;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(244, 155, 56, 0.3);
+}
+
+.verifyBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(244, 155, 56, 0.4);
+  background: linear-gradient(135deg, #ffb35c 0%, #F49B38 100%);
+}
+
+.verifyBtn:active {
+  transform: translateY(0);
+}
+
+.disclaimer {
+  font-size: 0.85rem;
+  color: #8c8279;
+  margin-top: 1.5rem;
+  font-style: italic;
+  line-height: 1.4;
+}

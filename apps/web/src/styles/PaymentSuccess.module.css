@@ -1,0 +1,1023 @@
+/* =========================================================
+   PAYMENT SUCCESS — PERGAMINO JAPONÉS / TEMA PLATA
+   ========================================================= */
+
+.container {
+  position: relative;
+
+  min-height: 100vh;
+  width: 100%;
+
+  box-sizing: border-box;
+
+  padding: 5rem 1.5rem;
+
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+
+  overflow: hidden;
+
+  color: #302116;
+
+  /*
+   * Fondo base:
+   * plata / grafito con un ligero tono cálido.
+   */
+  background:
+    radial-gradient(
+      circle at 50% 18%,
+      rgba(210, 207, 198, 0.16) 0%,
+      rgba(210, 207, 198, 0.06) 22%,
+      transparent 48%
+    ),
+    radial-gradient(
+      circle at 12% 65%,
+      rgba(138, 39, 30, 0.08) 0%,
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 88% 40%,
+      rgba(244, 155, 56, 0.045) 0%,
+      transparent 28%
+    ),
+    linear-gradient(
+      135deg,
+      #292a29 0%,
+      #202120 45%,
+      #171817 100%
+    );
+}
+
+.container::before {
+  content: "";
+
+  position: absolute;
+
+  top: -180px;
+  left: 50%;
+
+  width: 520px;
+  height: 520px;
+
+  transform: translateX(-50%);
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(220, 217, 207, 0.10) 0%,
+      rgba(220, 217, 207, 0.035) 38%,
+      transparent 70%
+    );
+
+  pointer-events: none;
+}
+
+.container::after {
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  pointer-events: none;
+
+  opacity: 0.18;
+
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.018) 0px,
+      rgba(255, 255, 255, 0.018) 1px,
+      transparent 1px,
+      transparent 5px
+    );
+}
+
+.container .parchment::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  bottom: 0;
+
+  left: 18px;
+
+  width: 1px;
+
+  background:
+    linear-gradient(
+      to bottom,
+      transparent,
+      rgba(138, 39, 30, 0.35) 20%,
+      rgba(138, 39, 30, 0.18) 50%,
+      rgba(138, 39, 30, 0.35) 80%,
+      transparent
+    );
+
+  pointer-events: none;
+}
+
+/* ESTE ES EL PERGAMINO */
+.parchment {
+  position: relative;
+
+  width: 100%;
+  max-width: 760px;
+
+  background-color: #E8D3A8;
+
+  border: 4px solid #8B6335;
+
+  box-sizing: border-box;
+
+  box-shadow:
+    0 35px 80px rgba(0, 0, 0, 0.65),
+    0 12px 30px rgba(0, 0, 0, 0.45),
+    0 0 80px rgba(232, 211, 168, 0.06);
+
+  overflow: hidden;
+}
+
+/* CONTENIDO INTERNO */
+.parchmentInner {
+  position: relative;
+
+  padding: 4.5rem 4.5rem 5rem;
+
+  background:
+    radial-gradient(
+      ellipse at center,
+      rgba(255, 248, 220, 0.35),
+      transparent 65%
+    );
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   PERGAMINO
+   ========================================================= */
+
+.wrapper {
+  position: relative;
+
+  width: 100%;
+  max-width: 760px;
+
+  box-sizing: border-box;
+
+  padding: 4.5rem 4.5rem 5rem;
+
+  /* COLOR BASE SÓLIDO DEL PERGAMINO */
+  background-color: #E8D3A8;
+
+  /* Textura / envejecimiento del papel */
+  background-image:
+    radial-gradient(
+      ellipse at 20% 15%,
+      rgba(255, 250, 225, 0.55) 0%,
+      transparent 35%
+    ),
+    radial-gradient(
+      ellipse at 80% 85%,
+      rgba(126, 78, 35, 0.12) 0%,
+      transparent 40%
+    ),
+    linear-gradient(
+      135deg,
+      rgba(255, 248, 220, 0.25),
+      rgba(194, 157, 99, 0.18)
+    );
+
+  border: 3px solid #8B6335;
+
+  border-radius: 4px;
+
+  box-shadow:
+    0 30px 70px rgba(0, 0, 0, 0.55),
+    0 8px 20px rgba(0, 0, 0, 0.35),
+    inset 0 0 45px rgba(104, 64, 27, 0.18),
+    inset 0 0 8px rgba(255, 248, 220, 0.7);
+
+  color: #332317;
+
+  overflow: hidden;
+
+  animation: parchmentAppear 0.8s ease both;
+}
+
+
+/* =========================================================
+   EXTREMOS DEL PERGAMINO
+   ========================================================= */
+
+.wrapper::before,
+.wrapper::after {
+  content: "";
+
+  position: absolute;
+
+  left: 2rem;
+  right: 2rem;
+
+  height: 10px;
+
+  border-radius: 50%;
+
+  pointer-events: none;
+
+  z-index: 1;
+}
+
+.wrapper::before {
+  top: 1.25rem;
+
+  background: #9A6B38;
+
+  box-shadow:
+    0 2px 5px rgba(70, 40, 15, 0.35),
+    inset 0 1px 2px rgba(255, 235, 190, 0.45);
+}
+
+.wrapper::after {
+  bottom: 1.25rem;
+
+  background: #9A6B38;
+
+  box-shadow:
+    0 -2px 5px rgba(70, 40, 15, 0.35),
+    inset 0 -1px 2px rgba(255, 235, 190, 0.45);
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.header {
+  position: relative;
+
+  text-align: center;
+
+  margin-bottom: 2.5rem;
+}
+
+
+/* Sello / símbolo superior */
+
+.header::before {
+  content: "勝";
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 68px;
+  height: 68px;
+
+  margin: 0 auto 1.25rem;
+
+  color: #8b251e;
+
+  font-family:
+    "Noto Serif JP",
+    "Yu Mincho",
+    "Hiragino Mincho ProN",
+    serif;
+
+  font-size: 1.8rem;
+  font-weight: 800;
+
+  border: 3px solid #8b251e;
+
+  background:
+    rgba(139, 37, 30, 0.06);
+
+  box-shadow:
+    inset 0 0 0 4px rgba(139, 37, 30, 0.08),
+    0 4px 12px rgba(90, 38, 28, 0.18);
+
+  transform: rotate(-3deg);
+}
+
+
+/* Ocultamos el check original */
+
+.header svg {
+  display: none;
+}
+
+
+/* =========================================================
+   TÍTULO
+   ========================================================= */
+
+.title {
+  margin: 0;
+
+  color: #6f211a;
+
+  font-family:
+    "Noto Serif JP",
+    "Yu Mincho",
+    "Hiragino Mincho ProN",
+    Georgia,
+    serif;
+
+  font-size: clamp(2rem, 4vw, 3rem);
+
+  font-weight: 900;
+
+  letter-spacing: 0.04em;
+
+  text-shadow:
+    0 1px 0 #fff5df,
+    0 2px 3px rgba(65, 43, 25, 0.18);
+}
+
+
+.subtitle {
+  margin: 0.8rem 0 0;
+
+  color: #504333;
+
+  font-family:
+    "Noto Serif JP",
+    "Yu Mincho",
+    Georgia,
+    serif;
+
+  font-size: 0.95rem;
+
+  font-weight: 600;
+
+  letter-spacing: 0.08em;
+}
+
+
+/* =========================================================
+   DIVISOR
+   ========================================================= */
+
+.header::after {
+  content: "──────  ❖  ──────";
+
+  display: block;
+
+  margin-top: 1.6rem;
+
+  color: #8b251e;
+
+  font-size: 0.9rem;
+
+  font-weight: 700;
+
+  letter-spacing: 0.12em;
+
+  opacity: 0.95;
+}
+
+
+/* =========================================================
+   MENSAJE DE AGRADECIMIENTO
+   ========================================================= */
+
+.successBox {
+  position: relative;
+
+  margin-bottom: 2.5rem;
+
+  padding: 1.6rem 1.8rem;
+
+  background:
+    rgba(255, 249, 230, 0.58);
+
+  border-top: 2px solid rgba(112, 85, 54, 0.42);
+  border-bottom: 2px solid rgba(112, 85, 54, 0.42);
+
+  box-shadow:
+    inset 0 5px 15px rgba(91, 55, 20, 0.05),
+    inset 0 -5px 15px rgba(91, 55, 20, 0.05);
+
+  text-align: center;
+}
+
+
+/* Japonés */
+
+.successBox::before {
+  content: "ありがとうございます";
+
+  display: block;
+
+  margin-bottom: 0.75rem;
+
+  color: #8b251e;
+
+  font-family:
+    "Noto Serif JP",
+    "Yu Mincho",
+    serif;
+
+  font-size: 1rem;
+
+  font-weight: 700;
+
+  letter-spacing: 0.14em;
+}
+
+
+.successText {
+  margin: 0;
+
+  color: #30291f;
+
+  font-family:
+    "Noto Serif JP",
+    "Yu Mincho",
+    Georgia,
+    serif;
+
+  font-size: 1rem;
+
+  line-height: 1.8;
+
+  font-weight: 600;
+}
+
+
+/* =========================================================
+   DETALLES DE LA ORDEN
+   ========================================================= */
+
+.card {
+  position: relative;
+
+  background:
+    rgba(255, 248, 224, 0.48);
+
+  border-top: 2px solid rgba(112, 85, 54, 0.38);
+  border-bottom: 2px solid rgba(112, 85, 54, 0.38);
+
+  box-shadow:
+    inset 0 8px 20px rgba(91, 55, 20, 0.045),
+    inset 0 -8px 20px rgba(91, 55, 20, 0.045);
+}
+
+
+.cardRow,
+.cardRowLast {
+  min-width: 0;
+  padding: 1.15rem 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-bottom: 1px solid rgba(91, 55, 20, 0.24);
+}
+
+
+.cardRowLast {
+  border-bottom: none;
+}
+
+
+/* Iconos */
+
+.cardRow svg,
+.cardRowLast svg {
+  flex-shrink: 0;
+
+  color: #8b251e !important;
+
+  opacity: 1;
+}
+
+
+/* Etiquetas */
+
+.rowLabel {
+  margin-bottom: 0.3rem;
+
+  color: #68533b;
+
+  font-family:
+    "Noto Serif JP",
+    "Yu Mincho",
+    serif;
+
+  font-size: 0.72rem;
+
+  font-weight: 800;
+
+  letter-spacing: 0.14em;
+
+  text-transform: uppercase;
+}
+
+
+/* Valores */
+
+.rowValue {
+  color: #30291f;
+
+  font-size: 0.95rem;
+
+  font-weight: 700;
+
+  word-break: break-word;
+}
+
+
+.rowValueMono {
+  color: #4a3827;
+
+  font-family:
+    "Courier New",
+    monospace;
+
+  font-size: 0.78rem;
+
+  font-weight: 600;
+
+  word-break: break-all;
+}
+
+
+.rowValueAmount {
+  color: #8b251e;
+
+  font-family:
+    "Noto Serif JP",
+    "Yu Mincho",
+    serif;
+
+  font-size: 1.4rem;
+
+  font-weight: 900;
+}
+
+
+/* =========================================================
+   ITEMS
+   ========================================================= */
+
+.itemsSection {
+  margin-top: 2.8rem;
+}
+
+
+.itemsTitle {
+  position: relative;
+
+  margin: 0 0 1.2rem;
+
+  color: #65231c;
+
+  font-family:
+    "Noto Serif JP",
+    "Yu Mincho",
+    Georgia,
+    serif;
+
+  font-size: 1.25rem;
+
+  font-weight: 900;
+
+  letter-spacing: 0.08em;
+
+  text-align: center;
+}
+
+
+.itemsTitle::before,
+.itemsTitle::after {
+  content: "";
+
+  display: inline-block;
+
+  width: 50px;
+
+  height: 2px;
+
+  margin: 0 0.8rem;
+
+  vertical-align: middle;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      #8b251e
+    );
+}
+
+
+.itemsTitle::after {
+  background:
+    linear-gradient(
+      90deg,
+      #8b251e,
+      transparent
+    );
+}
+
+
+.itemsList {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 0;
+}
+
+
+.itemCard {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 1rem;
+
+  padding: 1rem 0;
+
+  border-bottom: 1px dashed rgba(91, 55, 20, 0.38);
+}
+
+
+.itemCard:last-child {
+  border-bottom: none;
+}
+
+
+.itemName {
+  color: #33291f;
+
+  font-family:
+    "Noto Serif JP",
+    "Yu Mincho",
+    serif;
+
+  font-size: 1rem;
+
+  font-weight: 800;
+}
+
+
+.itemQuantity {
+  margin-top: 0.25rem;
+
+  color: #6c5941;
+
+  font-size: 0.8rem;
+
+  font-weight: 600;
+}
+
+
+.itemPrice {
+  color: #8b251e;
+
+  font-family:
+    "Noto Serif JP",
+    "Yu Mincho",
+    serif;
+
+  font-size: 1rem;
+
+  font-weight: 900;
+
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   PIE / SELLO FINAL
+   ========================================================= */
+
+.footerNote {
+  position: relative;
+
+  margin-top: 3rem;
+
+  min-height: 95px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  text-align: center;
+}
+
+
+/* Sello */
+
+.footerNote::after {
+  content: "完了";
+
+  position: absolute;
+
+  right: 0.5rem;
+  bottom: -0.5rem;
+
+  width: 76px;
+  height: 76px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  color: #98251e;
+
+  border: 4px solid #98251e;
+
+  font-family:
+    "Noto Serif JP",
+    "Yu Mincho",
+    serif;
+
+  font-size: 1.25rem;
+
+  font-weight: 900;
+
+  letter-spacing: 0.05em;
+
+  transform: rotate(-8deg);
+
+  background: rgba(139, 37, 30, 0.035);
+
+  box-shadow:
+    inset 0 0 0 3px rgba(152, 37, 30, 0.1),
+    0 2px 5px rgba(85, 35, 25, 0.12);
+
+  mix-blend-mode: multiply;
+}
+
+
+.footerNote p {
+  margin: 0;
+
+  color: #5d4a35;
+
+  font-family:
+    "Noto Serif JP",
+    "Yu Mincho",
+    serif;
+
+  font-size: 0.85rem;
+
+  font-weight: 600;
+
+  letter-spacing: 0.08em;
+}
+
+
+/* =========================================================
+   FIRMA
+   ========================================================= */
+
+.footerNote::before {
+  content: "コシビレッジ";
+
+  position: absolute;
+
+  left: 0.5rem;
+  bottom: 0.3rem;
+
+  color: #765d3d;
+
+  font-family:
+    "Noto Serif JP",
+    "Yu Mincho",
+    serif;
+
+  font-size: 0.85rem;
+
+  font-weight: 700;
+
+  letter-spacing: 0.12em;
+
+  transform: rotate(-3deg);
+}
+
+
+/* =========================================================
+   LÍNEA FINAL
+   ========================================================= */
+
+.wrapper > .footerNote {
+  border-top: 2px solid rgba(91, 55, 20, 0.24);
+}
+
+
+/* =========================================================
+   LOADING / ERROR
+   ========================================================= */
+
+.loadingContainer,
+.errorContainer {
+  min-height: 100vh;
+
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+
+  flex-direction: column;
+
+  gap: 1rem;
+
+  color: #f1eee8;
+
+  background:
+    radial-gradient(
+      ellipse at center,
+      #555b61,
+      #292d31
+    );
+}
+
+
+.errorMessage {
+  font-size: 1.1rem;
+
+  color: #d94e42;
+}
+
+
+.backButton {
+  padding: 0.75rem 1.4rem;
+
+  background:
+    linear-gradient(
+      135deg,
+      #d9a15a,
+      #a96f32
+    );
+
+  color: #241c15;
+
+  border: 1px solid #79502b;
+
+  border-radius: 6px;
+
+  cursor: pointer;
+
+  font-weight: 800;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+
+.backButton:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+
+/* =========================================================
+   ANIMACIÓN
+   ========================================================= */
+
+@keyframes parchmentAppear {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(20px)
+      scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+  .container {
+    padding: 2rem 0.75rem;
+  }
+
+  .wrapper {
+    padding: 3.5rem 1.5rem 4rem;
+  }
+
+  .wrapper::before,
+  .wrapper::after {
+    left: 1rem;
+    right: 1rem;
+  }
+
+  .title {
+    font-size: 1.8rem;
+  }
+
+  .subtitle {
+    font-size: 0.8rem;
+  }
+
+  .successText {
+    font-size: 0.9rem;
+  }
+
+  .cardRow,
+  .cardRowLast {
+    align-items: flex-start;
+  }
+
+  .footerNote::after {
+    width: 60px;
+    height: 60px;
+
+    font-size: 1rem;
+  }
+
+  .footerNote::before {
+    font-size: 0.7rem;
+  }
+}
+
+
+@media (max-width: 450px) {
+
+  .container {
+    padding: 1rem 0.4rem;
+  }
+
+  .wrapper {
+    padding: 3rem 1.1rem 3.5rem;
+  }
+
+  .title {
+    font-size: 1.55rem;
+  }
+
+  .header::before {
+    width: 52px;
+    height: 52px;
+
+    font-size: 1.4rem;
+  }
+
+  .cardRow,
+  .cardRowLast {
+    gap: 0.65rem;
+  }
+
+  .rowValue,
+  .rowValueMono {
+    font-size: 0.82rem;
+  }
+
+  .itemsTitle::before,
+  .itemsTitle::after {
+    width: 20px;
+
+    margin-left: 0.35rem;
+    margin-right: 0.35rem;
+  }
+
+  .footerNote::after {
+    position: relative;
+
+    right: auto;
+    bottom: auto;
+
+    margin-left: auto;
+  }
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+
+  .wrapper {
+    animation: none;
+  }
+
+  .backButton {
+    transition: none;
+  }
+}

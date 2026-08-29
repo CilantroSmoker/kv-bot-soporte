@@ -1,0 +1,856 @@
+/* =========================================================
+   NAVBAR
+========================================================= */
+
+.navbar {
+  width: 100%;
+  min-height: 75px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 60px;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(24, 17, 13, 0.98),
+      rgba(15, 11, 9, 0.98)
+    );
+
+  border-bottom: 1px solid rgba(200, 155, 60, 0.45);
+
+  box-sizing: border-box;
+
+  position: sticky;
+  top: 0;
+  z-index: 1100;
+
+  box-shadow:
+    0 4px 18px rgba(0, 0, 0, 0.5),
+    inset 0 -1px 0 rgba(244, 155, 56, 0.08);
+}
+
+/* =========================================================
+   BRAND
+========================================================= */
+
+.navLeft {
+  display: flex;
+  align-items: center;
+
+  min-width: 180px;
+}
+
+.navBrand {
+  position: relative;
+
+  display: inline-block;
+
+  color: #f49b38;
+
+  font-family:
+    "Noto Serif JP",
+    "Yu Mincho",
+    "Hiragino Mincho ProN",
+    Georgia,
+    serif;
+
+  font-size: 1.7rem;
+  font-weight: 800;
+
+  letter-spacing: 0.08em;
+
+  text-decoration: none;
+
+  text-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.65),
+    0 0 18px rgba(244, 155, 56, 0.1);
+
+  transition:
+    color 0.25s ease,
+    text-shadow 0.25s ease,
+    transform 0.25s ease;
+}
+
+.navBrand:hover {
+  color: #ffb35c;
+
+  text-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.65),
+    0 0 22px rgba(244, 155, 56, 0.25);
+
+  transform: translateY(-1px);
+}
+
+/* =========================================================
+   REFLEJO DEL LOGO
+========================================================= */
+
+/* =========================================================
+   REFLEJO SUTIL DEL LOGO
+========================================================= */
+
+.navBrand span {
+  position: relative;
+  display: inline-block;
+
+  overflow: hidden;
+}
+
+/*
+ * Reflejo muy fino y difuso.
+ *
+ * La intención no es que parezca una "barra de luz",
+ * sino una pequeña incidencia de luz sobre el acabado
+ * dorado del texto.
+ */
+
+.navBrand span::before {
+  content: "";
+
+  position: absolute;
+
+  top: -20%;
+  bottom: -20%;
+
+  left: -45%;
+
+  width: 28%;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 225, 175, 0.02) 20%,
+      rgba(255, 225, 175, 0.16) 42%,
+      rgba(255, 235, 195, 0.30) 50%,
+      rgba(255, 225, 175, 0.16) 58%,
+      rgba(255, 225, 175, 0.02) 80%,
+      transparent 100%
+    );
+
+  transform:
+    skewX(-18deg)
+    translateX(0);
+
+  filter: blur(1.5px);
+
+  opacity: 0;
+
+  pointer-events: none;
+
+  animation:
+    koshiBrandReflection
+    14s
+    ease-in-out
+    infinite;
+}
+
+@keyframes koshiBrandReflection {
+
+  /* El logo permanece limpio */
+
+  0% {
+    left: -45%;
+    opacity: 0;
+  }
+
+  /* Aparición extremadamente gradual */
+
+  16% {
+    opacity: 0;
+  }
+
+  21% {
+    opacity: 0.45;
+  }
+
+  /* Punto de mayor incidencia */
+
+  28% {
+    opacity: 0.65;
+  }
+
+  /* Sale lentamente */
+
+  38% {
+    left: 125%;
+    opacity: 0;
+  }
+
+  /* Gran pausa */
+
+  100% {
+    left: 125%;
+    opacity: 0;
+  }
+}
+
+/* =========================================================
+   DETALLE ORNAMENTAL DEL LOGO
+========================================================= */
+
+.navBrand::after {
+  content: "";
+
+  position: absolute;
+
+  left: 50%;
+  bottom: -7px;
+
+  width: 42px;
+  height: 1px;
+
+  transform: translateX(-50%);
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(244, 155, 56, 0.8),
+      transparent
+    );
+
+  opacity: 0.65;
+}
+
+/* =========================================================
+   LINKS CENTRALES
+========================================================= */
+
+.navCenter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 42px;
+
+  flex: 1;
+}
+
+.navLink {
+  position: relative;
+
+  white-space: nowrap;
+
+  text-decoration: none;
+
+  color: #eae6df;
+
+  font-family:
+    "Noto Serif JP",
+    "Yu Mincho",
+    "Hiragino Mincho ProN",
+    Georgia,
+    serif;
+
+  font-size: 0.95rem;
+  font-weight: 600;
+
+  letter-spacing: 0.08em;
+
+  transition:
+    color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.navLink::after {
+  content: "";
+
+  position: absolute;
+
+  left: 50%;
+  bottom: -8px;
+
+  width: 0;
+  height: 1px;
+
+  transform: translateX(-50%);
+
+  background: #f49b38;
+
+  box-shadow:
+    0 0 8px rgba(244, 155, 56, 0.35);
+
+  transition: width 0.25s ease;
+}
+
+.navLink:hover {
+  color: #f49b38;
+
+  transform: translateY(-1px);
+}
+
+.navLink:hover::after {
+  width: 65%;
+}
+
+/* =========================================================
+   ACCOUNT
+========================================================= */
+
+.accountMenu {
+  position: relative;
+}
+
+.accountButton {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  background: transparent;
+  border: none;
+
+  color: #eae6df;
+
+  cursor: pointer;
+
+  padding: 8px 4px;
+
+  font-family:
+    Inter,
+    system-ui,
+    sans-serif;
+
+  font-size: 0.9rem;
+
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.accountButton:hover {
+  color: #f49b38;
+
+  transform: translateY(-1px);
+}
+
+.accountArrow {
+  font-size: 0.65rem;
+
+  color: #9e958b;
+
+  transition:
+    transform 0.2s ease,
+    color 0.2s ease;
+}
+
+.accountArrowOpen {
+  transform: rotate(180deg);
+
+  color: #f49b38;
+}
+
+/* =========================================================
+   DROPDOWN
+========================================================= */
+
+.dropdown {
+  position: absolute;
+
+  right: 0;
+  top: calc(100% + 14px);
+
+  width: 270px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(30, 22, 17, 0.99),
+      rgba(12, 10, 8, 0.99)
+    );
+
+  border: 1px solid rgba(200, 155, 60, 0.35);
+
+  border-radius: 10px;
+
+  padding: 1rem;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 0.85rem;
+
+  z-index: 2000;
+
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+
+  animation:
+    dropdownAppear
+    0.18s
+    ease-out;
+}
+
+@keyframes dropdownAppear {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.accountItem {
+  display: flex;
+  flex-direction: column;
+
+  gap: 5px;
+
+  color: #eae6df;
+}
+
+.accountItem strong {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  color: #f0ebe4;
+
+  font-size: 0.88rem;
+}
+
+.accountItem strong svg {
+  color: #f49b38;
+}
+
+.accountItem span {
+  color: #a9a29a;
+
+  font-size: 0.82rem;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dropdownDivider {
+  width: 100%;
+  height: 1px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(200, 155, 60, 0.25),
+      transparent
+    );
+}
+
+/* =========================================================
+   ACTION BUTTON
+========================================================= */
+
+.actionButton {
+  width: 100%;
+
+  margin-top: 7px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #f49b38 0%,
+      #b86b1b 100%
+    );
+
+  color: #120e0c;
+
+  border: none;
+  border-radius: 5px;
+
+  padding: 8px 10px;
+
+  cursor: pointer;
+
+  font-weight: 700;
+  font-size: 0.8rem;
+
+  transition:
+    transform 0.2s ease,
+    filter 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.actionButton:hover {
+  background:
+    linear-gradient(
+      135deg,
+      #ffb35c 0%,
+      #f49b38 100%
+    );
+
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 4px 12px rgba(244, 155, 56, 0.2);
+}
+
+/* =========================================================
+   USUARIO + CARRITO
+========================================================= */
+
+.navRight {
+  display: flex;
+  align-items: center;
+
+  justify-content: flex-end;
+
+  gap: 25px;
+
+  min-width: 180px;
+}
+
+.userSection {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  color: #eae6df;
+}
+
+/* =========================================================
+   CARRITO
+========================================================= */
+
+.cartIcon {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 36px;
+  height: 36px;
+
+  padding: 0;
+
+  border: none;
+  background: transparent;
+
+  cursor: pointer;
+
+  color: #f49b38;
+
+  transition:
+    transform 0.2s ease,
+    color 0.2s ease;
+}
+
+.cartIcon:hover {
+  color: #ffb35c;
+
+  transform: scale(1.08);
+}
+
+.cartBadge {
+  position: absolute;
+
+  top: -4px;
+  right: -5px;
+
+  background: #8a271e;
+
+  color: #fff;
+
+  border: 2px solid #160f0b;
+
+  border-radius: 50%;
+
+  min-width: 18px;
+  height: 18px;
+
+  padding: 0 3px;
+
+  box-sizing: border-box;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  line-height: 1;
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+.menuButton {
+  display: none;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 40px;
+  height: 40px;
+
+  padding: 0;
+
+  background: transparent;
+  border: none;
+
+  color: #f49b38;
+
+  cursor: pointer;
+
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.menuButton:hover {
+  color: #ffb35c;
+  transform: scale(1.05);
+}
+
+.menuButton svg {
+  display: block;
+}
+
+.mobileCart {
+  display: none;
+
+  position: relative;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 40px;
+  height: 40px;
+
+  padding: 0;
+
+  background: transparent;
+  border: none;
+
+  color: #f49b38;
+
+  cursor: pointer;
+}
+
+/* =========================================================
+   MOBILE ACCOUNT
+========================================================= */
+
+.mobileActions {
+  display: none;
+}
+
+.mobileAccount {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  color: #f49b38;
+
+  font-family:
+    Inter,
+    system-ui,
+    sans-serif;
+
+  font-weight: 600;
+}
+
+.mobileAccountDetails {
+  display: flex;
+  flex-direction: column;
+
+  width: min(320px, 85vw);
+
+  gap: 18px;
+
+  padding-top: 4px;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1000px) {
+
+  .navbar {
+    padding: 0 35px;
+  }
+
+  .navCenter {
+    gap: 28px;
+  }
+
+  .navRight {
+    gap: 18px;
+  }
+
+  .navLeft,
+  .navRight {
+    min-width: 150px;
+  }
+
+}
+
+@media (max-width: 768px) {
+
+  .navbar {
+    min-height: 75px;
+
+    padding: 0 20px;
+  }
+
+  .navLeft {
+    min-width: auto;
+  }
+
+  .navBrand {
+    font-size: 1.4rem;
+
+    letter-spacing: 0.06em;
+  }
+
+  /* Ocultar acciones de escritorio */
+
+  .navRight {
+    display: none;
+  }
+
+  /* Carrito móvil */
+
+  .mobileCart {
+    display: flex;
+
+    margin-left: auto;
+    margin-right: 8px;
+  }
+
+  /* Botón menú */
+
+  .menuButton {
+    display: flex;
+  }
+
+  /* Menú */
+
+  .navCenter {
+    position: absolute;
+
+    top: 75px;
+    left: 0;
+
+    width: 100%;
+
+    box-sizing: border-box;
+
+    background:
+      linear-gradient(
+        180deg,
+        rgba(24, 17, 13, 0.995),
+        rgba(15, 11, 9, 0.995)
+      );
+
+    display: none;
+
+    flex-direction: column;
+    align-items: center;
+
+    gap: 28px;
+
+    padding: 30px 20px 35px;
+
+    border-bottom:
+      1px solid rgba(200, 155, 60, 0.4);
+
+    box-shadow:
+      0 10px 25px rgba(0, 0, 0, 0.5);
+  }
+
+  .navCenter.open {
+    display: flex;
+
+    animation:
+      mobileMenuAppear
+      0.2s
+      ease-out;
+  }
+
+  @keyframes mobileMenuAppear {
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .navLink {
+    font-size: 1rem;
+  }
+
+  /* Cuenta móvil */
+
+  .mobileActions {
+    display: flex;
+
+    flex-direction: column;
+    align-items: center;
+
+    width: 100%;
+
+    gap: 18px;
+
+    padding-top: 8px;
+
+    border-top:
+      1px solid rgba(200, 155, 60, 0.18);
+  }
+
+  .accountItem {
+    width: 100%;
+
+    text-align: left;
+  }
+
+}
+
+@media (max-width: 480px) {
+
+  .navbar {
+    padding: 0 15px;
+  }
+
+  .navBrand {
+    font-size: 1.2rem;
+
+    letter-spacing: 0.04em;
+  }
+
+  .mobileCart,
+  .menuButton {
+    width: 36px;
+    height: 36px;
+  }
+
+  .navCenter {
+    gap: 24px;
+
+    padding-top: 25px;
+    padding-bottom: 30px;
+  }
+
+  .navLink {
+    font-size: 0.95rem;
+  }
+
+}
