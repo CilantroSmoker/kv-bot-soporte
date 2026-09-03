@@ -31,12 +31,11 @@ export class XpCalculatorService {
   }
 
   calculateXpGain(messageLength: number): number {
-    const base = 5;
-    const perChar = Math.floor(messageLength / 4);
+  const base = 25;
+  const perChar = Math.floor(messageLength / 4);
 
-    return Math.min(base + perChar, 50);
-  }
-
+  return Math.min(base + perChar, 75);
+}
 
   checkLevelUp(
     currentLevel: number,

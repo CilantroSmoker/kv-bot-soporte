@@ -23,9 +23,17 @@ export class LevelUpNotificationService {
         return;
       }
 
-      const titleInfo = this.levelTitle.getTitleByLevel(newLevel);
+      const rankUpInfo = this.levelTitle.getRankUpTitle(newLevel);
 
-      const message = `🗡️ <@${discordId}> ha alcanzado el nivel ${newLevel}\n⚔️ Se acerca más a ser un "${titleInfo.title}"`;
+      let message: string;
+
+      if (rankUpInfo) {
+        message = `🎉 <@${discordId}> ha alcanzado el nivel ${newLevel}\n${rankUpInfo.emoji} ¡Ha ascendido al rango **${rankUpInfo.title}**!`;
+      } else {
+        const nextTitle = this.levelTitle.getNextTitleByLevel(newLevel);
+
+        message = `🗡 <@${discordId}> ha alcanzado el nivel ${newLevel}\n⚔ Se acerca más a ser un "${nextTitle}"`;
+      }
 
       await channel.send(message);
 

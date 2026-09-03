@@ -45,11 +45,7 @@ export class LevelsService {
 
     const xpGain = Math.min(
   this.xpCalc.calculateXpGain(messageLength),
-  50,
-);
-
-console.log(
-  `🔥 XP DEBUG | user=${discordId} | length=${messageLength} | before=${user.xp} | gain=${xpGain}`,
+  75,
 );
 
 const currentXp = Number(user.xp);

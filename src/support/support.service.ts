@@ -216,42 +216,85 @@ export class SupportService {
     }
 
     let mensaje = '';
+    let mencionRol = '';
 
-    if (tipoEvento === 'skills_x2') {
-      const notificacionesRoleId = this.configService.get<string>('DISCORD_NOTIFICACIONES_ROLE_ID') ?? '';
-      const mencionRol = notificacionesRoleId ? `<@&${notificacionesRoleId}>` : '@Notificaciones';
+    if (tipoEvento === 'evento_pvp') {
+      const notificacionesRoleId = this.configService.get<string>('NOTIFICATIONS_ROLE_ID') ?? '';
+      mencionRol = notificacionesRoleId ? `<@&${notificacionesRoleId}>` : '@Notificaciones';
 
-      mensaje = `# 🌟 ¡EVENTO DE COMUNIDAD: X2 EXP! 🌟\n` +
-        `¡Buenas noticias! Para activar el servidor y meterle ganas al juego, les traemos un **Evento de Habilidades** especial. ¡Es el momento perfecto para viciar y mejorar a sus personajes! \n\n` +
-        `Durante las próximas **24 horas**, todos tendrán los beneficios activos en el servidor. ¡No se lo pierdan!\n\n` +
+      mensaje = `# **⚔ ¡TORNEO DE PVP: KOSHI VILLAGE! ⚔**\n` +
+        `Nos alegra anunciar un nuevo evento oficial en nuestra comunidad. A continuación, les compartimos todos los detalles y la información clave sobre este enfrentamiento.\n\n` +
         `---\n\n` +
-        `### 🔮 BENEFICIOS DEL EVENTO\n` +
-        `* 💠 **Doble Experiencia (x2 EXP)** en todas las \`/skills\`.\n` +
-        `* 💠 Progreso acelerado para subir de nivel mucho más rápido.\n` +
-        `* 💠 Incremento masivo en tus estadísticas principales:\n` +
-        `  > ❤ **Vida** • 🔮 **Maná** • ⚡ **Agilidad** • 🛡 **Durabilidad**\n\n` +
+        `### **📌 INFORMACIÓN DEL EVENTO**\n` +
+        `• **Modalidad:** Torneo de PvP competitivo.\n` +
+        `• **Fecha y Hora:** <t:${unixTimestamp}:F>\n` +
+        `• **Comienza:** <t:${unixTimestamp}:R>\n` +
         `---\n\n` +
-        `### ⏰ CRONOGRAMA DE INICIO\n` +
-        `* 📅 **El evento arranca el:** <t:${unixTimestamp}:F>\n` +
-        `* ⏳ **Falta exactamente:** <t:${unixTimestamp}:R>\n` +
-        `* 🕒 **Duración:** ¡24 Horas continuas de puro leveleo!\n\n` +
+        `### **⚔ FASES Y COMBATE**\n` +
+        `El torneo se jugará por llaves de eliminación directa:\n\n` +
+        `• **Octavos a Semifinales:** Se combatirá usando un kit estándar de diamante.\n` +
+        `• **La Gran Final:** Los finalistas se disputarán el título usando el poderoso **Kit Elite**.\n\n` +
         `---\n\n` +
-        `❗ **Consejo del Staff:** Preparen sus pociones, armen sus rutas de entrenamiento y avísenle a su grupo. ¡Aprovechen cada hora al máximo!\n\n` +
-        `🔥 **¡Nos vemos dentro del juego! Que comience el vicio.** 🔥\n\n` +
-        `${mencionRol}`;
+        `### **🏆 RECOMPENSAS Y PREMIOS**\n` +
+        `**Podio de ganadores del torneo**\n\n` +
+        `> **🥇 1er lugar (El Campeón)**\n` +
+        `> • **15k** monedas\n` +
+        `> • **x16** bloques de diamante\n` +
+        `> • **x16** bloques de oro\n` +
+        `> • **Rol** único dentro del servidor de discord: **(Campeón)** x 1 semana\n` +
+        `> • **x1** pieza a elección del **kit Elite**\n` +
+        `> • **x1** llave ONI\n` +
+        `> • **x1** yelmo de diamante protección IV\n` +
+        `> • **x1** pechera de diamante protección IV\n` +
+        `> • **x1** grebas de diamante protección IV\n` +
+        `> • **x1** botas de diamante protección IV\n\n` +
+        `> **🥈 2do lugar (Subcampeón)**\n` +
+        `> • **10k** monedas\n` +
+        `> • **x8** bloques de diamante\n` +
+        `> • **x8** bloques de oro\n` +
+        `> • **x1** llave DIVINA\n` +
+        `> • **x1** yelmo de diamante protección III\n` +
+        `> • **x1** pechera de diamante protección III\n` +
+        `> • **x1** grebas de diamante protección III\n` +
+        `> • **x1** botas de diamante protección III\n\n` +
+        `> **🥉 3er lugar**\n` +
+        `> • **5k** de monedas\n` +
+        `> • **x4** bloques de diamante\n` +
+        `> • **x4** bloques de oro\n` +
+        `> • **x1** llave IMPERIAL\n` +
+        `> • **x1** yelmo de diamante\n` +
+        `> • **x1** pechera de diamante\n` +
+        `> • **x1** grebas de diamante\n` +
+        `> • **x1** botas de diamante\n\n` +
+        `---\n\n` +         
+        `El torneo está abierto para todos y todas. ¡Cualquier duda o consulta, favor de abrir un **ticket**!`;
     }
 
     if (!mensaje) {
       return interaction.editReply({ content: 'El tipo de evento seleccionado no tiene una plantilla configurada.' });
     }
 
-    await channel.send({ content: mensaje });
+    // Enviamos el embed con la barra lateral de color y el spoiler del rol fuera o adjunto
+    await channel.send({
+      content: `||${mencionRol}||`,
+      embeds: [
+        {
+          description: mensaje,
+          color: 0x3498db,
+          timestamp: new Date().toISOString(),
+          footer: {
+            text: 'Koshi Village • Evento Oficial'
+          }
+        }
+      ]
+    });
+
     await interaction.editReply({ content: '¡Panel de evento enviado de forma exitosa!' });
 
     await this.sendGeneralLog(
-      guild, 
-      'Evento de Comunidad Publicado', 
-      `Se ha programado y enviado la publicación del evento **${tipoEvento}** en el canal <#${channel.id}>.`, 
+      guild,  
+      'Evento de Comunidad Publicado',  
+      `Se ha programado y enviado la publicación del evento **${tipoEvento}** en el canal <#${channel.id}>.`,  
       interaction.user.tag
     );
   }

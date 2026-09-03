@@ -28,11 +28,12 @@ import { LeaderboardsCommand } from './commands/leaderboards.command';
     LeaderboardsCommand,
   ],
   exports: [
-    PlayerStatsService,
-    LeaderboardsReaderService,
-    StatsCommand,
-    TopstatsCommand,
-    LeaderboardsCommand,
-  ],
+  PlayerStatsService,
+  LeaderboardsReaderService,
+  LeaderboardUpdaterService,
+  StatsCommand,
+  TopstatsCommand,
+  LeaderboardsCommand,
+],
 })
 export class PlayerStatsModule {}

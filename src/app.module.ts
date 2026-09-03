@@ -9,6 +9,8 @@ import { SuggestionsModule } from './suggestions/suggestions.module';
 import { SupportModule } from './support/support.module';
 import { ServerInfoModule } from './server-info/server-info.module';
 import { PlayerStatsModule } from './player-stats/player-stats.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { ClansModule } from './clans/clans.module';
 
 @Module({
   imports: [
@@ -63,6 +65,8 @@ import { PlayerStatsModule } from './player-stats/player-stats.module';
     SupportModule,
     ServerInfoModule,
     PlayerStatsModule,
+    NotificationsModule,
+    ClansModule,
   ],
 })
 export class AppModule {}

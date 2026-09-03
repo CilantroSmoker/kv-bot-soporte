@@ -8,6 +8,8 @@ import { PlayerStatsModule } from './player-stats/player-stats.module';
 import { DiscordLogsService } from './discord-logs.service';
 import { LevelsModule } from './levels/levels.module';
 import { StatusUpdaterService } from './server-info/status-updater.service';
+import { NotificationsModule } from './notifications/notifications.module';
+import { ClansModule } from './clans/clans.module';
 
 @Module({
   imports: [
@@ -17,6 +19,8 @@ import { StatusUpdaterService } from './server-info/status-updater.service';
     SupportModule,
     ServerInfoModule,
     forwardRef(() => PlayerStatsModule),
+    NotificationsModule,
+    ClansModule,
   ],
   providers: [
     DiscordService,

@@ -19,13 +19,17 @@ export class DiscordRoleService {
   ): Promise<void> {
     try {
       const titleInfo = this.levelTitle.getTitleByLevel(level);
-
-      const roleIds = {
-        Aprendiz: this.configService.get<string>('LEVEL_ROLE_APRENDIZ'),
-        Guerrero: this.configService.get<string>('LEVEL_ROLE_GUERRERO'),
-        Samurai: this.configService.get<string>('LEVEL_ROLE_SAMURAI'),
-        Maestro: this.configService.get<string>('LEVEL_ROLE_MAESTRO'),
-      };
+	
+	const roleIds = {
+	  Novato: this.configService.get<string>('LEVEL_ROLE_NOVATO'),
+	  Shinobi: this.configService.get<string>('LEVEL_ROLE_SHINOBI'),
+	  Aprendiz: this.configService.get<string>('LEVEL_ROLE_APRENDIZ'),
+	  Guerrero: this.configService.get<string>('LEVEL_ROLE_GUERRERO'),
+	  Veterano: this.configService.get<string>('LEVEL_ROLE_VETERANO'),
+	  Samurai: this.configService.get<string>('LEVEL_ROLE_SAMURAI'),
+	  Ronin: this.configService.get<string>('LEVEL_ROLE_RONIN'),
+	  Maestro: this.configService.get<string>('LEVEL_ROLE_MAESTRO'),
+	};
 
       const newRoleId = roleIds[titleInfo.title as keyof typeof roleIds];
 

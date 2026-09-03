@@ -23,28 +23,20 @@ export class StatusUpdaterService implements OnModuleInit {
 
   @Interval(30000)
   async updateStatus(): Promise<void> {
-    this.logger.log('⏱ Ejecutando actualización de Server Status...');
 
-    try {
-      if (!this.discordService.isReady()) {
-  this.logger.warn('⚠ DiscordService todavía no está listo.');
-  return;
-}
+	    try {
+	      if (!this.discordService.isReady()) {
+	  this.logger.warn('⚠ DiscordService todavía no está listo.');
+	  return;
+	}
 
-      this.logger.log('📡 Consultando estado de Minecraft...');
 
       const status =
         await this.serverStatusService.getServerStatus();
 
-      this.logger.log(
-        `📊 Estado recibido: online=${status.online}, players=${status.players}, ping=${status.latency}ms`,
-      );
-
-      this.logger.log('📝 Actualizando embed de Server Status...');
 
       await this.discordService.updateServerStatusEmbed(status);
 
-      this.logger.log('✅ Embed de Server Status actualizado correctamente.');
 
     } catch (error) {
       this.logger.error(

@@ -9,6 +9,7 @@ import { SendPanelCommand } from './tickets/send-panel.command';
 import { MessageListener } from './levels/listeners/message.listener';
 import { LevelCommand } from './levels/commands/level.command';
 import { RankCommand } from './levels/commands/rank.command';
+import { ClansPanelCommand } from './clans/clans-panel.command';
 
 import {
   APIEmbed,
@@ -35,6 +36,11 @@ import { TopstatsCommand } from './player-stats/commands/topstats.command';
 import { LeaderboardsCommand } from './player-stats/commands/leaderboards.command';
 import { SupportService } from './support/support.service';
 import { LeaderboardEntry } from './player-stats/services/leaderboards-reader.service';
+import { LeaderboardUpdaterService } from './player-stats/services/leaderboard-updater.service';
+import { NotificationsInteractionHandler } from './notifications/notifications-interaction.handler';
+import { ClansInteractionHandler } from './clans/clans-interaction.handler';
+import { ClanCommand } from './clans/clan.command';
+import { NotificationsPanelService } from './notifications/notifications-panel.service';
 
 export const STATUS_TAG: Record<SuggestionStatus, string> = {
   [SuggestionStatus.PENDING]: 'Pendiente',
@@ -88,6 +94,13 @@ async fetchTextChannel(channelId: string): Promise<TextChannel | null> {
     private readonly messageListener: MessageListener,
     private readonly levelCommand: LevelCommand,
     private readonly rankCommand: RankCommand,
+    @Inject(forwardRef(() => LeaderboardUpdaterService))
+    private readonly leaderboardUpdaterService: LeaderboardUpdaterService,
+    private readonly notificationsInteractionHandler: NotificationsInteractionHandler,
+    private readonly clansInteractionHandler: ClansInteractionHandler,
+    private readonly clanCommand: ClanCommand,
+    private readonly clansPanelCommand: ClansPanelCommand,
+    private readonly notificationsPanelService: NotificationsPanelService,
   ) {
     const token = this.configService.get<string>('DISCORD_TOKEN');
     this.botEnabled = Boolean(token);
@@ -109,7 +122,19 @@ async fetchTextChannel(channelId: string): Promise<TextChannel | null> {
     });
 
     this.client.once(Events.ClientReady, async () => {
-      this.logger.log(`Discord client ready as ${this.client.user?.tag}`);
+  this.logger.log(`Discord client ready as ${this.client.user?.tag}`);
+
+  this.logger.log(' Ejecutando actualización inicial de rankings...');
+
+  try {
+    await this.leaderboardUpdaterService.updateLeaderboards();
+    this.logger.log(' Actualización inicial de rankings completada.');
+  } catch (error) {
+    this.logger.error(
+      '❌ Error en la actualización inicial de rankings',
+      error,
+    );
+  }
 
       const commandData = {
         name: 'send-panel',
@@ -138,6 +163,11 @@ async fetchTextChannel(channelId: string): Promise<TextChannel | null> {
             description: 'Envía un comunicado general del bot sin eventos',
             type: 1,
           },
+	  {
+	     name: 'notificaciones',
+	     description: 'Publica el panel para activar o desactivar las notificaciones',
+	     type: 1,
+	  },
           {
             name: 'reglas-discord',
             description: 'Publica el reglamento del servidor de Discord',
@@ -158,7 +188,7 @@ async fetchTextChannel(channelId: string): Promise<TextChannel | null> {
                 description: 'Selecciona el tipo de evento',
                 type: 3,
                 required: true,
-                choices: [{ name: 'Multiplicador x2 EXP en Skills', value: 'skills_x2' }],
+                choices: [{ name: 'Evento PVP', value: 'evento_pvp' }],
               },
               {
                 name: 'horas_inicio',
@@ -191,6 +221,8 @@ async fetchTextChannel(channelId: string): Promise<TextChannel | null> {
           this.leaderboardsCommand.getSlashCommand(),
           this.levelCommand.getSlashCommand(),
           this.rankCommand.getSlashCommand(),
+          this.clanCommand.getSlashCommand(),
+	  this.clansPanelCommand.getSlashCommand(),
         ]);
 
         this.logger.log(
@@ -208,6 +240,13 @@ async fetchTextChannel(channelId: string): Promise<TextChannel | null> {
           return;
         }
 
+	if (
+  interaction.isChatInputCommand() &&
+  interaction.commandName === 'send-panel-clan'
+) {
+  await this.clansPanelCommand.execute(interaction);
+  return;
+}
         if (interaction.commandName === 'send-panel-status') {
           try {
             await interaction.deferReply({
@@ -239,11 +278,28 @@ async fetchTextChannel(channelId: string): Promise<TextChannel | null> {
             const subcomando = interaction.options.getSubcommand();
 
             if (subcomando === 'soporte') {
-              const tipo = interaction.options.getString('tipo');
-              await this.supportService.handleSendPanelCommand(interaction, tipo);
-            } else if (subcomando === 'comunicado') {
-              await this.supportService.handleSendPanelCommand(interaction, 'bot');
-            } else if (subcomando === 'reglas-discord') {
+  const tipo = interaction.options.getString('tipo');
+  await this.supportService.handleSendPanelCommand(interaction, tipo);
+} else if (subcomando === 'comunicado') {
+  await this.supportService.handleSendPanelCommand(interaction, 'bot');
+} else if (subcomando === 'notificaciones') {
+  const channel = interaction.channel;
+
+  if (!channel || channel.type !== ChannelType.GuildText) {
+    await interaction.editReply({
+      content: '❌ Este comando solo puede utilizarse en un canal de texto.',
+    });
+    return;
+  }
+
+  const messageId = await this.notificationsPanelService.sendPanel(channel);
+
+  await interaction.editReply({
+    content:
+      `✅ Panel de notificaciones publicado correctamente.\n` +
+      `ID del mensaje: \`${messageId}\``,
+  });
+} else if (subcomando === 'reglas-discord') {
               await this.sendPanelCommand.executeReglasDiscord(interaction);
             } else if (subcomando === 'reglas-servidor') {
               await this.sendPanelCommand.executeReglasServidor(interaction);
@@ -296,6 +352,11 @@ async fetchTextChannel(channelId: string): Promise<TextChannel | null> {
         return;
       }
 
+      if (interaction.isChatInputCommand() && interaction.commandName === 'clan') {
+	  await this.clanCommand.execute(interaction);
+	  return;
+	}
+
       if (interaction.isChatInputCommand() && interaction.commandName === 'rank') {
         await this.rankCommand.execute(interaction);
         return;
@@ -303,6 +364,8 @@ async fetchTextChannel(channelId: string): Promise<TextChannel | null> {
 
       await this.ticketsInteractionHandler.handle(interaction);
       await this.suggestionsInteractionHandler.handle(interaction);
+      await this.notificationsInteractionHandler.handle(interaction);
+      await this.clansInteractionHandler.handle(interaction);
     });
 
     this.client.on(Events.MessageCreate, async (message: Message) => {
