@@ -24,7 +24,7 @@ export class MessageListener {
     const now = Date.now();
     const lastXpTime = this.cooldowns.get(userId) || 0;
 
-    if (now - lastXpTime < 60000) {
+    if (now - lastXpTime < 30000) {
       return;
     }
 

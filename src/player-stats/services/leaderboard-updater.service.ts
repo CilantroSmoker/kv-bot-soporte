@@ -1,5 +1,5 @@
 import { ConfigService } from '@nestjs/config';
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger, forwardRef } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { LeaderboardsReaderService } from './leaderboards-reader.service';
 import { DiscordService } from '../../discord.service';
@@ -8,34 +8,54 @@ import {
   TextChannel,
 } from 'discord.js';
 
+type LeaderboardType = 'time' | 'kills' | 'money';
+type LeaderboardPeriod = 'daily' | 'weekly' | 'monthly';
+
 @Injectable()
 export class LeaderboardUpdaterService {
   private readonly logger = new Logger(LeaderboardUpdaterService.name);
 
   constructor(
     private readonly leaderboardsReader: LeaderboardsReaderService,
-    private readonly discordService: DiscordService,
     private readonly configService: ConfigService,
+    @Inject(forwardRef(() => DiscordService))
+    private readonly discordService: DiscordService,
   ) {}
 
-  @Cron('*/30 * * * * *')
-  async updateDailyLeaderboards(): Promise<void> {
-    this.logger.log('⏱ Actualizando rankings diarios...');
 
+  @Cron('0 */12 * * *')
+   async updateLeaderboards(): Promise<void> {
+
+    try {
+      await this.updatePeriod('daily');
+      await this.updatePeriod('weekly');
+      await this.updatePeriod('monthly');
+
+    } catch (error) {
+      this.logger.error(
+        '❌ Error actualizando rankings',
+        error,
+      );
+    }
+  }
+
+  private async updatePeriod(
+    period: LeaderboardPeriod,
+  ): Promise<void> {
     const channelId = this.configService.get<string>(
-      'LEADERBOARD_DAILY_CHANNEL_ID',
+      `LEADERBOARD_${period.toUpperCase()}_CHANNEL_ID`,
     );
 
     const timeMessageId = this.configService.get<string>(
-      'LEADERBOARD_DAILY_TIME_MESSAGE_ID',
+      `LEADERBOARD_${period.toUpperCase()}_TIME_MESSAGE_ID`,
     );
 
     const killsMessageId = this.configService.get<string>(
-      'LEADERBOARD_DAILY_KILLS_MESSAGE_ID',
+      `LEADERBOARD_${period.toUpperCase()}_KILLS_MESSAGE_ID`,
     );
 
     const moneyMessageId = this.configService.get<string>(
-      'LEADERBOARD_DAILY_MONEY_MESSAGE_ID',
+      `LEADERBOARD_${period.toUpperCase()}_MONEY_MESSAGE_ID`,
     );
 
     if (
@@ -45,70 +65,69 @@ export class LeaderboardUpdaterService {
       !moneyMessageId
     ) {
       this.logger.error(
-        '❌ Faltan IDs de los rankings diarios en .env',
+        `❌ Faltan IDs para los rankings ${period}.`,
       );
       return;
     }
 
-    try {
-      const channel = await this.discordService.fetchTextChannel(channelId);
+    const channel = await this.discordService.fetchTextChannel(channelId);
 
-      if (!channel) {
-        this.logger.error(
-          `❌ No se encontró el canal de rankings diarios: ${channelId}`,
-        );
-        return;
-      }
-
-      await this.updateLeaderboardMessage(
-        channel,
-        timeMessageId,
-        'time',
-        '⏱️ Tiempo Jugado',
-      );
-
-      await this.updateLeaderboardMessage(
-        channel,
-        killsMessageId,
-        'kills',
-        '⚔️ Player Kills',
-      );
-
-      await this.updateLeaderboardMessage(
-        channel,
-        moneyMessageId,
-        'money',
-        '💰 Balance',
-      );
-
-      this.logger.log('✅ Rankings diarios actualizados correctamente.');
-    } catch (error) {
+    if (!channel) {
       this.logger.error(
-        '❌ Error actualizando rankings diarios',
-        error,
+        `❌ No se encontró el canal de rankings ${period}: ${channelId}`,
       );
+      return;
     }
+
+    const periodName = this.getPeriodName(period);
+
+    await this.updateLeaderboardMessage(
+      channel,
+      timeMessageId,
+      'time',
+      `⏱ Tiempo Jugado`,
+      period,
+      periodName,
+    );
+
+    await this.updateLeaderboardMessage(
+      channel,
+      killsMessageId,
+      'kills',
+      `⚔ Player Kills`,
+      period,
+      periodName,
+    );
+
+    await this.updateLeaderboardMessage(
+      channel,
+      moneyMessageId,
+      'money',
+      `💰 Balance`,
+      period,
+      periodName,
+    );
   }
 
   private async updateLeaderboardMessage(
     channel: TextChannel,
     messageId: string,
-    type: 'time' | 'kills' | 'money',
+    type: LeaderboardType,
     title: string,
+    period: LeaderboardPeriod,
+    periodName: string,
   ): Promise<void> {
     try {
-      const leaderboard = await this.leaderboardsReader.getLeaderboard(
-        type,
-        'daily',
-        10,
-      );
+      const leaderboard =
+        await this.leaderboardsReader.getLeaderboard(
+          type,
+          period,
+          10,
+        );
 
       if (!leaderboard.length) {
-        this.logger.warn(
-          `⚠ No hay datos para el ranking ${type}.`,
-        );
-        return;
-      }
+	  return;
+	}
 
       const message = await channel.messages.fetch(messageId);
 
@@ -128,7 +147,9 @@ export class LeaderboardUpdaterService {
         } else if (type === 'money') {
           value = `$${entry.score.toLocaleString('es-CL')} monedas`;
         } else if (type === 'kills') {
-          value = `${entry.score.toLocaleString('es-CL')} jugadores asesinados`;
+          value = `${entry.score.toLocaleString(
+            'es-CL',
+          )} jugadores asesinados`;
         }
 
         return {
@@ -139,7 +160,7 @@ export class LeaderboardUpdaterService {
       });
 
       const embed = new EmbedBuilder()
-        .setTitle(`🏆 ${title} - Diario`)
+        .setTitle(`🏆 ${title} - ${periodName}`)
         .setColor(0xffd700)
         .addFields(fields)
         .setTimestamp();
@@ -147,15 +168,26 @@ export class LeaderboardUpdaterService {
       await message.edit({
         embeds: [embed],
       });
-
-      this.logger.log(
-        `✅ Ranking ${type} actualizado. Mensaje: ${messageId}`,
-      );
     } catch (error) {
       this.logger.error(
-        `❌ Error actualizando ranking ${type}. Mensaje: ${messageId}`,
+        `❌ Error actualizando ranking ${type} ${period}. Mensaje: ${messageId}`,
         error,
       );
+    }
+  }
+
+  private getPeriodName(
+    period: LeaderboardPeriod,
+  ): string {
+    switch (period) {
+      case 'daily':
+        return 'Diario';
+
+      case 'weekly':
+        return 'Semanal';
+
+      case 'monthly':
+        return 'Mensual';
     }
   }
 }
